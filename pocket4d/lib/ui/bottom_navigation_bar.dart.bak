@@ -1,0 +1,29 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:dpo/entity/component.dart';
+import 'package:dpo/entity/data.dart';
+import 'package:dpo/ui/base_widget.dart';
+import 'package:dpo/ui/basic.dart';
+
+class BottomNavigationBarStateless extends BaseWidget {
+  BottomNavigationBarStateless(BaseWidget parent, String pageId,
+      MethodChannel methodChannel, Component component)
+      : super(
+            parent: parent,
+            pageId: pageId,
+            methodChannel: methodChannel,
+            component: component,
+            data: ValueNotifier(Data(component.properties)));
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+        builder: (BuildContext context, Data data, Widget child) {
+          return BottomNavigationBar(
+              key: ObjectKey(component),
+              items: data.children.isNotEmpty ? data.children[0] : null);
+        },
+        valueListenable: this.data);
+  }
+}
