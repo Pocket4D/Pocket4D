@@ -35,7 +35,7 @@
    1. install: [http://mumu.163.com/](http://mumu.163.com/)
    2. usage:
     ```bash
-    adb connect 127.0.0.1:5555 && flutter install
+    adb connect 127.0.0.1:5555
     ```
 4. usd `flutter doctor -v` to see if your flutter enviorment is installed correctly
 
