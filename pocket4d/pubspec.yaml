@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   # thrio: ^0.2.2
   json_annotation: ^3.0.1
+  ffi: ^0.1.3
 
 dev_dependencies:
   flutter_test:
