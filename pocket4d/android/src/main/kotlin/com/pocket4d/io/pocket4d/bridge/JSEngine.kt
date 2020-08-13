@@ -10,13 +10,14 @@ import kotlinx.coroutines.*
 
 class JSEngine {
     private val messages = mutableListOf<Pair<Int, String>>()
-    private val config = JsBridgeConfig.bareConfig().apply {
-        consoleConfig.enabled = true
-        consoleConfig.mode = JsBridgeConfig.ConsoleConfig.Mode.AsString
-        consoleConfig.appendMessage = { priority, message ->
-            messages.add(priority to message)
-        }
-    }
+//    private val config = JsBridgeConfig.bareConfig().apply {
+//        consoleConfig.enabled = true
+//        consoleConfig.mode = JsBridgeConfig.ConsoleConfig.Mode.AsString
+//        consoleConfig.appendMessage = { priority, message ->
+//            messages.add(priority to message)
+//        }
+//    }
+    private val config = JsBridgeConfig.standardConfig();
     private var runtime: JsBridge
     private val errorTag = "JSEngine"
     var runtimeInitialized = false
@@ -41,6 +42,10 @@ class JSEngine {
 
     fun evalVoid(script: String) {
         runtime.evaluateNoRetVal(script)
+    }
+
+    suspend fun evaluate(script: String) {
+        runtime.evaluate<String>(script)
     }
 
     fun release() {

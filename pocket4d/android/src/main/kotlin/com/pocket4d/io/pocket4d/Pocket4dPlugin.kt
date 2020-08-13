@@ -73,8 +73,7 @@ class Pocket4dPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     @SuppressLint("LogNotTimber")
     private fun initFramework() {
-        Log.i("initFramework", "initFramework");
-        // engine.evalVoid("console.log('fuck')")
+        Log.i("initFramework", "initFramework")
         val js = """
             console.log("This is a log with undefined and null:", undefined, "-", null);
             console.info("This is an info with 2 integers:", 1664, "and", 69);
@@ -83,8 +82,11 @@ class Pocket4dPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             console.assert(1 == 1, "should not be displayed");
             console.assert(1 == 2, "should be displayed");
             """
-        jsAppEngine.evalVoid(js)
-        runBlocking { jsAppEngine.waitForDone() }
+
+        runBlocking {
+            jsAppEngine.evalVoid(js)
+            jsAppEngine.waitForDone()
+        }
 
     }
 

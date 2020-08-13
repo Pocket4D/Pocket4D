@@ -18,7 +18,7 @@
 ## Project Structure
 
 1. `framework `-- a javascript framework that runs the FMP bundle
-2. `pocket4d` -- main project intro
+2. `pocket4d` -- main project entry
 3. `pocket4d/android` -- kotlin/java code
 4. `pocket4d/ios` -- swift/oc code
 5. `pocket4d/lib` -- dart code
