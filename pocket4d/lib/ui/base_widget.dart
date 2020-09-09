@@ -1,22 +1,18 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:pocket4d/entity/component.dart';
 import 'package:pocket4d/entity/data.dart';
 import 'package:pocket4d/entity/property.dart';
+// import 'package:quickjs_dart/quickjs_dart.dart';
 
 abstract class BaseWidget extends StatelessWidget {
   final String pageId;
   final Component component;
-  final MethodChannel methodChannel;
+  // final JSEngine engine;
   final BaseWidget parent;
   final ValueNotifier<Data> data;
 
-  BaseWidget(
-      {this.pageId,
-      this.component,
-      this.methodChannel,
-      this.parent,
-      this.data});
+  BaseWidget({this.pageId, this.component, this.parent, this.data});
 
   void setChildren(List<BaseWidget> children) {
     data.value.children = children;

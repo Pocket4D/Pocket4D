@@ -1,9 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:pocket4d/entity/property.dart';
+import 'package:pocket4d/p4d/view_controller.dart' as viewApis;
 
-const String TYPE_TAP = "tab";
+const String TYPE_TAP = "tap";
 const String TYPE_SCROLL = "scroll";
 
 String _createTapEvent(String id, Map<String, dynamic> dataSet, String type) {
@@ -26,8 +27,8 @@ String _createScrollEvent(String id, double offset, String type) {
   return jsonEncode(event);
 }
 
-onTapEvent(MethodChannel methodChannel, String pageId, String id,
-    Map<String, Property> properties, String event) {
+onTapEvent(String pageId, String id, Map<String, Property> properties, String event) {
+
   var prefix = 'data-';
   var dataSet = Map<String, dynamic>();
   properties.forEach((k, v) {
@@ -42,23 +43,20 @@ onTapEvent(MethodChannel methodChannel, String pageId, String id,
   });
   var func = event.replaceAll('()', '');
   String json = _createTapEvent(id, dataSet, TYPE_TAP);
-//  print('json = $json');
-  methodChannel
-      .invokeMethod('event', {'pageId': pageId, 'event': func, 'data': json});
+  // methodChannel.invokeMethod('event', {'pageId': pageId, 'event': func, 'data': json});
+  viewApis.event(pageId, func, json);
 }
 
-onScrollEvent(MethodChannel methodChannel, String pageId, String id,
-    String event, double offset) {
+onScrollEvent(String pageId, String id, String event, double offset) {
   var func = event.replaceAll('()', '');
   String json = _createScrollEvent(id, offset, TYPE_SCROLL);
 //  print('json = $json');
-  methodChannel
-      .invokeMethod('event', {'pageId': pageId, 'event': func, 'data': json});
+  // methodChannel.invokeMethod('event', {'pageId': pageId, 'event': func, 'data': json});
+  viewApis.event(pageId, func, json);
 }
 
-onScrollLimitEvent(
-    MethodChannel methodChannel, String pageId, String id, String event) {
+onScrollLimitEvent(String pageId, String id, String event) {
   var func = event.replaceAll('()', '');
-  methodChannel
-      .invokeMethod('event', {'pageId': pageId, 'event': func, 'data': ""});
+  // methodChannel.invokeMethod('event', {'pageId': pageId, 'event': func, 'data': ""});
+  viewApis.event(pageId, func, "");
 }

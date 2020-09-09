@@ -1,19 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:pocket4d/entity/component.dart';
 import 'package:pocket4d/entity/data.dart';
 import 'package:pocket4d/ui/base_widget.dart';
 import 'package:pocket4d/util/color_util.dart';
 import 'package:pocket4d/util/event_util.dart';
+// import 'package:quickjs_dart/quickjs_dart.dart';
 
 class RaisedButtonStateless extends BaseWidget {
-  RaisedButtonStateless(BaseWidget parent, String pageId,
-      MethodChannel methodChannel, Component component)
+  RaisedButtonStateless(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
-            methodChannel: methodChannel,
+            // engine: engine,
             component: component,
             data: ValueNotifier(Data(component.properties)));
 
@@ -34,8 +34,7 @@ class RaisedButtonStateless extends BaseWidget {
               onPressed: () {
                 var bindTap = component.events['bindtap'];
                 if (null != bindTap) {
-                  onTapEvent(methodChannel, pageId, this.hashCode.toString(),
-                      data.map, bindTap);
+                  onTapEvent(pageId, this.hashCode.toString(), data.map, bindTap);
                 }
               },
               key: ObjectKey(component),

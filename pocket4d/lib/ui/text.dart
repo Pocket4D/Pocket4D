@@ -1,18 +1,18 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:pocket4d/entity/component.dart';
 import 'package:pocket4d/entity/data.dart';
 import 'package:pocket4d/ui/base_widget.dart';
 import 'package:pocket4d/ui/basic.dart';
 import 'package:pocket4d/util/color_util.dart';
+// import 'package:quickjs_dart/quickjs_dart.dart';
 
 class TextStateless extends BaseWidget {
-  TextStateless(BaseWidget parent, String pageId, MethodChannel methodChannel,
-      Component component)
+  TextStateless(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
-            methodChannel: methodChannel,
+            // engine: engine,
             component: component,
             data: ValueNotifier(Data(component.properties)));
 
@@ -24,8 +24,7 @@ class TextStateless extends BaseWidget {
               key: ObjectKey(component),
               style: TextStyle(
                   inherit: MBool.parse(data.map['inherit'], defaultValue: true),
-                  fontSize:
-                      MDouble.parse(data.map['font-size'], defaultValue: 14),
+                  fontSize: MDouble.parse(data.map['font-size'], defaultValue: 14),
                   backgroundColor: dealColor(data.map['background-color']),
                   color: dealFontColor(data.map['color'])));
         },

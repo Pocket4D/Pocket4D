@@ -1,4 +1,4 @@
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:pocket4d/entity/component.dart';
 import 'package:pocket4d/entity/property.dart';
 import 'package:pocket4d/ui/circular_progress_indicator.dart';
@@ -11,6 +11,7 @@ import 'package:pocket4d/ui/stack.dart';
 import 'package:pocket4d/ui/text.dart';
 import 'package:pocket4d/ui/visibility.dart';
 import 'package:pocket4d/util/expression_util.dart';
+import 'package:quickjs_dart/quickjs_dart.dart';
 
 import 'aspect_ratio.dart';
 import 'base_widget.dart';
@@ -23,42 +24,38 @@ import 'image.dart';
 
 class UIFactory {
   final String _pageId;
-  final MethodChannel _methodChannel;
+  // final JSEngine _engine;
   final Map<String, Component> _componentMap = Map();
   final Map<String, BaseWidget> _widgetMap = Map();
 
-  UIFactory(this._pageId, this._methodChannel);
+  UIFactory(this._pageId);
 
   /// 克隆节点id, inRepeatIndex, inRepeatPrefixExp不为空
-  Future<Component> createComponentTree(
+  Component createComponentTree(
       Component parent, Map<String, dynamic> node, Map<String, dynamic> styles,
-      {id, inRepeatIndex, inRepeatPrefixExp}) async {
+      {id, inRepeatIndex, inRepeatPrefixExp}) {
     var component = Component(parent, node, styles,
-        id: id,
-        inRepeatIndex: inRepeatIndex,
-        inRepeatPrefixExp: inRepeatPrefixExp);
+        id: id, inRepeatIndex: inRepeatIndex, inRepeatPrefixExp: inRepeatPrefixExp);
     _componentMap.putIfAbsent(component.id, () => component);
-    await _addChildren(component, node, styles);
+    _addChildren(component, node, styles);
     return component;
   }
 
   /// 为Component添加children
-  Future _addChildren(Component parent, Map<String, dynamic> data,
-      Map<String, dynamic> styles) async {
+  _addChildren(Component parent, Map<String, dynamic> data, Map<String, dynamic> styles) {
     var children = data['childNodes'];
     if (null != children) {
       for (var child in children) {
-        var result = await createComponentTree(parent, child, styles);
+        var result = createComponentTree(parent, child, styles);
         parent.children.add(result);
       }
     }
   }
 
-  Future<List<BaseWidget>> _getChildren(
-      BaseWidget parent, Component component) async {
+  List<BaseWidget> _getChildren(BaseWidget parent, Component component) {
     List<BaseWidget> children = [];
     for (var it in component?.children) {
-      var child = await createWidgetTree(parent, it);
+      var child = createWidgetTree(parent, it);
       if (null != child) {
         if (child is List<BaseWidget>) {
           children.addAll(child);
@@ -70,9 +67,9 @@ class UIFactory {
     return children;
   }
 
-  Future _updateChildren(BaseWidget widget) async {
+  _updateChildren(BaseWidget widget) {
     for (var it in widget.data.value.children) {
-      await handleProperty(_methodChannel, _pageId, it.component);
+      handleProperty(_pageId, it.component);
       it.updateProperties(it.component.properties);
       if (it.data.value.children.isNotEmpty) {
         _updateChildren(it);
@@ -80,15 +77,12 @@ class UIFactory {
     }
   }
 
-  Future<dynamic> createWidgetTree(BaseWidget parent, Component component,
-      {newSize}) async {
+  createWidgetTree(BaseWidget parent, Component component, {newSize}) {
     var repeat = component.getRealForExpression();
     if (null != repeat) {
       repeat = getInRepeatExp(component, repeat);
       var id = component.id;
-      var rawSize = newSize ??
-          await calcRepeatSize(
-              _methodChannel, _pageId, id, TYPE_DIRECTIVE, 'repeat', repeat);
+      var rawSize = newSize ?? calcRepeatSize(_pageId, id, TYPE_DIRECTIVE, 'repeat', repeat);
       int size = int.parse(rawSize.toString(), radix: 10);
       if (size > 0) {
         var indexName = component.getForIndexName();
@@ -97,33 +91,30 @@ class UIFactory {
         var parentInRepeatPrefixExp = component.parent?.inRepeatPrefixExp;
         List<BaseWidget> widgets = [];
         for (var index = 0; index < size; index++) {
-          var inRepeatPrefixExp = getInRepeatPrefixExp(
-              indexName, itemName, exp, index, parentInRepeatPrefixExp);
+          var inRepeatPrefixExp =
+              getInRepeatPrefixExp(indexName, itemName, exp, index, parentInRepeatPrefixExp);
           var inRepeatId = "$id-$index";
 
           /// 缓存复用
           var clone = _componentMap[inRepeatId];
           if (null == clone) {
-            clone = await createComponentTree(
-                component.parent, component.node, component.styles,
-                id: inRepeatId,
-                inRepeatIndex: index,
-                inRepeatPrefixExp: inRepeatPrefixExp);
+            clone = createComponentTree(component.parent, component.node, component.styles,
+                id: inRepeatId, inRepeatIndex: index, inRepeatPrefixExp: inRepeatPrefixExp);
           }
 
           /// 处理表达式
-          await handleProperty(_methodChannel, _pageId, clone);
+          handleProperty(_pageId, clone);
 
           /// 缓存复用
           var widget = _widgetMap[inRepeatId];
           if (null == widget) {
             widget = _createWidget(parent, clone);
-            widget.setChildren(await _getChildren(widget, clone));
+            widget.setChildren(_getChildren(widget, clone));
             _widgetMap.putIfAbsent(clone.id, () => widget);
           } else {
             /// 此处复用需要更新复用的属性及children的属性的表达式值
             widget.updateProperties(clone.properties);
-            await _updateChildren(widget);
+            _updateChildren(widget);
           }
           widgets.add(widget);
         }
@@ -132,9 +123,9 @@ class UIFactory {
         return null;
       }
     } else {
-      await handleProperty(_methodChannel, _pageId, component);
+      handleProperty(_pageId, component);
       BaseWidget widget = _createWidget(parent, component);
-      widget.setChildren(await _getChildren(widget, component));
+      widget.setChildren(_getChildren(widget, component));
       _widgetMap.putIfAbsent(component.id, () => widget);
       return widget;
     }
@@ -146,30 +137,28 @@ class UIFactory {
       case "body":
         component.properties['width-factor'] = Property("1");
         component.properties['height-factor'] = Property("1");
-        widget = CenterStateless(parent, _pageId, _methodChannel, component);
+        widget = CenterStateless(parent, _pageId, component);
         break;
       case "center":
-        widget = CenterStateless(parent, _pageId, _methodChannel, component);
+        widget = CenterStateless(parent, _pageId, component);
         break;
       case "column":
-        widget = ColumnStateless(parent, _pageId, _methodChannel, component);
+        widget = ColumnStateless(parent, _pageId, component);
         break;
       case "row":
-        widget = RowStateless(parent, _pageId, _methodChannel, component);
+        widget = RowStateless(parent, _pageId, component);
         break;
       case "stack":
-        widget = StackStateless(parent, _pageId, _methodChannel, component);
+        widget = StackStateless(parent, _pageId, component);
         break;
       case "positioned":
-        widget =
-            PositionedStateless(parent, _pageId, _methodChannel, component);
+        widget = PositionedStateless(parent, _pageId, component);
         break;
       case "singlechildscrollview":
-        widget = SingleChildScrollViewStateless(
-            parent, _pageId, _methodChannel, component);
+        widget = SingleChildScrollViewStateless(parent, _pageId, component);
         break;
       case "listview":
-        widget = ListViewStateless(parent, _pageId, _methodChannel, component);
+        widget = ListViewStateless(parent, _pageId, component);
         break;
 //      case "nestedscrollview":
 //        widget = _createNestedScrollView(component.properties, child);
@@ -178,36 +167,31 @@ class UIFactory {
 //        widget = _createClipOval(component.properties, child);
 //        break;
       case "container":
-        widget = ContainerStateless(parent, _pageId, _methodChannel, component);
+        widget = ContainerStateless(parent, _pageId, component);
         break;
       case "expanded":
-        widget = ExpandedStateless(parent, _pageId, _methodChannel, component);
+        widget = ExpandedStateless(parent, _pageId, component);
         break;
       case "fractionallysizedbox":
-        widget = FractionallySizedBoxStateless(
-            parent, _pageId, _methodChannel, component);
+        widget = FractionallySizedBoxStateless(parent, _pageId, component);
         break;
       case "aspectratio":
-        widget =
-            AspectRatioStateless(parent, _pageId, _methodChannel, component);
+        widget = AspectRatioStateless(parent, _pageId, component);
         break;
       case "raisedbutton":
-        widget =
-            RaisedButtonStateless(parent, _pageId, _methodChannel, component);
+        widget = RaisedButtonStateless(parent, _pageId, component);
         break;
       case "visibility":
-        widget =
-            VisibilityStateless(parent, _pageId, _methodChannel, component);
+        widget = VisibilityStateless(parent, _pageId, component);
         break;
       case "text":
-        widget = TextStateless(parent, _pageId, _methodChannel, component);
+        widget = TextStateless(parent, _pageId, component);
         break;
       case "image":
-        widget = ImageStateless(parent, _pageId, _methodChannel, component);
+        widget = ImageStateless(parent, _pageId, component);
         break;
       case "circularprogressindicator":
-        widget = CircularProgressIndicatorStateless(
-            parent, _pageId, _methodChannel, component);
+        widget = CircularProgressIndicatorStateless(parent, _pageId, component);
         break;
       default:
         var text = Property('未实现控件${component.tag}');
@@ -217,7 +201,7 @@ class UIFactory {
           ..putIfAbsent('font-size', () => font)
           ..putIfAbsent('color', () => color)
           ..putIfAbsent('innerHTML', () => text);
-        widget = TextStateless(parent, _pageId, _methodChannel, component);
+        widget = TextStateless(parent, _pageId, component);
         break;
     }
     return widget;
@@ -228,13 +212,12 @@ class UIFactory {
     _widgetMap.clear();
   }
 
-  Future<List<BaseWidget>> _getNewChildren(Component parent,
-      Component component, BaseWidget parentWidget, int size) async {
+  List<BaseWidget> _getNewChildren(
+      Component parent, Component component, BaseWidget parentWidget, int size) {
     List<BaseWidget> children = [];
     for (var it in parent.children) {
       if (it == component) {
-        List<BaseWidget> result =
-            await createWidgetTree(parentWidget, component, newSize: size);
+        List<BaseWidget> result = createWidgetTree(parentWidget, component, newSize: size);
         if (null != result) {
           children.addAll(result);
         }
@@ -257,7 +240,7 @@ class UIFactory {
     return children;
   }
 
-  Future updateTree(List<dynamic> list) async {
+  updateTree(List<dynamic> list) {
     for (var it in list) {
       var type = it['type'];
       var id = it['id'];
@@ -268,13 +251,11 @@ class UIFactory {
           if (_componentMap.containsKey(id)) {
             var component = _componentMap[id];
             var parentId = component.parent.id;
-            if (_componentMap.containsKey(parentId) &&
-                _widgetMap.containsKey(parentId)) {
+            if (_componentMap.containsKey(parentId) && _widgetMap.containsKey(parentId)) {
               var parentComponent = _componentMap[parentId];
               var parentWidget = _widgetMap[parentId];
               var newSize = it['value'];
-              var children = await _getNewChildren(
-                  parentComponent, component, parentWidget, newSize);
+              var children = _getNewChildren(parentComponent, component, parentWidget, newSize);
               parentWidget.updateChildren(children);
             }
           }

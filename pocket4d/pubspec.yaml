@@ -1,8 +1,7 @@
 name: pocket4d
 description: A new flutter plugin project.
 version: 0.0.1
-author:
-homepage:
+homepage: 'https://github.com/pocket4d'
 
 environment:
   sdk: '>=2.1.0 <3.0.0'
@@ -10,9 +9,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # thrio: ^0.2.2
   json_annotation: ^3.0.1
   ffi: ^0.1.3
+  event_bus: ^1.1.1
+  dva_dart: ^0.1.1
+  dva_flutter: ^0.1.1
+  flutter_downloader: ^1.4.1
+  path_provider: ^1.6.0
+  # permission_handler: ^4.2.0+hotfix.3
+  dio: ^3.0.10
+  uuid: ^2.2.2
+  fluttertoast: ^7.0.4
+  quickjs_dart:
+    path: '../../quickjs_dart'
 
 dev_dependencies:
   flutter_test:
