@@ -16,6 +16,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
 
+
   @override
   void initState() {
     super.initState();
@@ -27,8 +28,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: P4D(
         store: store,
-        bundleApiUrl: "http://$url:3000/api/bundleJson?appId=1",
-        indexKey: "home",
+        bundleApiUrl: "http://$url:3001/api/v1/bundled",
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:pocket4d/p4d/view_controller.dart' as viewApi;
 import 'package:pocket4d/ui/ui_factory.dart';
 import 'package:pocket4d/util/base64.dart';
 import 'package:pocket4d/util/color_util.dart';
+import 'package:quickjs_dart/quickjs_dart.dart';
 
 import 'abstract.dart';
 
@@ -15,11 +16,9 @@ class P4DPage extends StatefulWidget {
   final Map<String, dynamic> args;
   final Map<String, dynamic> pages;
   final Map<String, dynamic> handlers;
-  final Function removeHandler;
   final String indexPage;
 
-  P4DPage(
-      this.args, this.pages, this.handlers, this.indexPage, this.removeHandler);
+  P4DPage(this.args, this.pages, this.handlers, this.indexPage);
 
   @override
   _P4DPageState createState() =>
@@ -64,13 +63,10 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
     _pageId = _pageCode + this.hashCode.toString();
     _factory = UIFactory(_pageId);
     _handlers.putIfAbsent(_pageId, () => this);
-
-
-
   }
 
   _initMessageHandler(Map<String, dynamic> message) {
-    print(message);
+    logger.i(message);
 
     var pageId = message['pageId'];
     P4DMessageHandler handler = _handlers[pageId];
@@ -82,7 +78,7 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
       _pages.putIfAbsent(pageCode, () => content);
       _handlers.forEach((k, v) {
         if (k.startsWith(pageCode)) {
-          print(message);
+          logger.i(message);
           v.onMessage(message);
         }
       });
@@ -142,8 +138,8 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
           ..putIfAbsent("args", () => params);
 
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => P4DPage(
-                args, _pages, _handlers, _indexPage, widget.removeHandler)));
+            builder: (context) =>
+                P4DPage(args, _pages, _handlers, _indexPage)));
       }
     }
   }
@@ -181,7 +177,7 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
   }
 
   void _initScript(String script) {
-    // print(decodeBase64(script));
+    // logger.i(decodeBase64(script));
     viewApi.attachPage(_pageId, decodeBase64(script));
     viewApi.initComplete(_pageId);
   }
@@ -194,15 +190,16 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
     viewApi.onUnload(_pageId);
   }
 
-  void _startPullDownRefresh(Map<String, dynamic> map) {
-    if (null != _refreshIndicatorKey) {
-      _refreshIndicatorKey.currentState.show();
-    }
-  }
+  void _togglePullDownRefresh(Map<String, dynamic> map) {
+    if (map["message"] == true) {
+      if (null != _refreshIndicatorKey) {
+        _refreshIndicatorKey.currentState.show();
+      }
+    } else {
 
-  void _stopPullDownRefresh(Map<String, dynamic> map) {
-    if (null != _completer) {
-      _completer.complete(true);
+      if (null != _completer) {
+        _completer.complete(true);
+      }
     }
   }
 
@@ -276,12 +273,12 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-//    print("lifecycle didChangeDependencies $_pageId");
+//    logger.i("lifecycle didChangeDependencies $_pageId");
   }
 
   @override
   void dispose() {
-    print("lifecycle dispose $_pageId");
+    logger.i("lifecycle dispose $_pageId");
     _handlers.remove(_pageId);
     _factory.clear();
     _callOnUnload();
@@ -294,35 +291,32 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
     // TODO: implement onMessage
     int type = message['type'];
     switch (type) {
-      case 0: //socket
+      case EventManager.TYPE_SOCKET: //socket
         _socket(message);
         break;
-      case 1: //onclick setData
+      case EventManager.TYPE_REFRESH: //onclick setData
         _update(message);
         break;
-      case 2: //set_navigation_bar_title
+      case EventManager.TYPE_NAVIGATION_BAR_TITLE: //set_navigation_bar_title
         _updateTitle(message);
         break;
-      case 3: //navigate_to
+      case EventManager.TYPE_NAVIGATE_TO: //navigate_to
         _navigateTo(message);
         break;
-      case 4: //set_navigation_bar_color
+      case EventManager.TYPE_NAVIGATION_BAR_COLOR: //set_navigation_bar_color
         _setNavigationBarColor(message);
         break;
-      case 5: //set_background_color
+      case EventManager.TYPE_BACKGROUND_COLOR: //set_background_color
         _setBackgroundColor(message);
         break;
-      case 6: //start_pull_down_refresh
-        _startPullDownRefresh(message);
-        break;
-      case 7: //stop_pull_down_refresh
-        _stopPullDownRefresh(message);
-        break;
-      case 8:
+      case EventManager.TYPE_TOGGLE_LOADING:
         _toggleLoading(message);
         break;
-      case 9:
+      case EventManager.TYPE_TOGGLE_TOAST:
         _toggleToast(message);
+        break;
+      case EventManager.TYPE_TOGGLE_PULL_DOWN_REFRESH:
+        _togglePullDownRefresh(message);
         break;
     }
   }

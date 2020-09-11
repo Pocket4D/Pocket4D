@@ -16,16 +16,16 @@ dependencies:
   dva_flutter: ^0.1.1
   flutter_downloader: ^1.4.1
   path_provider: ^1.6.0
-  # permission_handler: ^4.2.0+hotfix.3
   dio: ^3.0.10
   uuid: ^2.2.2
   fluttertoast: ^7.0.4
-  quickjs_dart:
-    path: '../../quickjs_dart'
+  quickjs_dart: '>=0.0.1 <1.0.0'
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  json_serializable: ^3.2.5
+  build_runner: ^1.7.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -20,3 +20,14 @@ Future<Map<String, String>> getBundle(
     throw e;
   }
 }
+
+
+Future requestAppList(String url)async{
+  try {
+    Response response =
+        await Dio().get(url, options:  Options(responseType: ResponseType.json));
+    return response;
+  } catch (e) {
+    throw e;
+  }
+}

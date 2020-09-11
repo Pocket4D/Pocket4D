@@ -18,7 +18,7 @@ class DefaultLoadingPage extends StatelessWidget {
 }
 
 Widget p4dAppContainer(
-    {BuildContext context, String bundleApiUrl, String indexKey}) {
+    {BuildContext context, String bundleApiUrl}) {
   return DvaConnector(
     context: context,
     key: Key('P4DAppPage'),
@@ -31,7 +31,7 @@ Widget p4dAppContainer(
           bundleApiUrl.startsWith("http")) {
         dispatch(Dva.createAction('p4dApp/getBundle')(
             Dva.Payload<Map<String, String>>(
-                {"bundleApiUrl": bundleApiUrl, "indexKey": indexKey})));
+                {"bundleApiUrl": bundleApiUrl})));
       }
 
       // dispatch(Dva.createAction('dpoMiniApp/getBundle')(Dva.Payload(null)));
@@ -41,8 +41,7 @@ Widget p4dAppContainer(
             hybridAppState.pages,
             hybridAppState.handlers,
             hybridAppState.indexPage,
-            (String pageId) => dispatch(Dva.createAction(
-                'p4dApp/removeHandler')(Dva.Payload<String>(pageId))));
+           );
       }
 
       return DefaultLoadingPage();

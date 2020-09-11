@@ -1,4 +1,3 @@
-// import 'package:event_bus/event_bus.dart';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -8,11 +7,6 @@ import 'package:uuid/uuid.dart';
 
 class P4DPageManager {
   Map<String, JSValue> pageMap = Map();
-
-  //
-  //String currentPageId;
-
-  // final EventBus eventBus = EventBus();
   static P4DPageManager _instance;
 
   /// 内部构造方法，可避免外部暴露构造函数，进行实例化
@@ -60,7 +54,7 @@ class P4DPageManager {
           engine: engine,
           name: "__native__refresh",
           handler: (args, localEngine, thisVal) {
-            print("__native__refresh");
+            logger.i("__native__refresh");
             var localPageId = page.getProperty("pageId").toDartString();
             var data = engine.fromJSVal(args[0]).toString();
             onRefresh(localPageId, data);
@@ -77,7 +71,7 @@ class P4DPageManager {
             var localPageId = page.getProperty("pageId").toDartString();
             var data = engine.fromJSVal(args[0]);
             if (null != data && (data as Map).containsKey("title")) {
-              print({
+              logger.i({
                 "method": "setNavigationBarTitle",
                 "localPageId": localPageId,
                 "data": data["title"]
@@ -97,8 +91,7 @@ class P4DPageManager {
             var localPageId = page.getProperty("pageId").toDartString();
             var data = engine.fromJSVal(args[0]);
             if (null != data && (data as Map).containsKey("backgroundColor")) {
-              // EventManager.instance.sendMessage(what = EventManager.TYPE_NAVIGATION_BAR_TITLE, pageId = localPageId, obj = data.getString("title"))
-              print({
+              logger.i({
                 "method": "setNavigationBarColor",
                 "localPageId": localPageId,
                 "data": data["backgroundColor"]
@@ -118,7 +111,7 @@ class P4DPageManager {
             var localPageId = page.getProperty("pageId").toDartString();
             var data = engine.fromJSVal(args[0]);
             if (null != data && (data as Map).containsKey("backgroundColor")) {
-              print({
+              logger.i({
                 "method": "setBackgroundColor",
                 "localPageId": localPageId,
                 "data": data["backgroundColor"]
@@ -127,7 +120,6 @@ class P4DPageManager {
                   EventManager.TYPE_BACKGROUND_COLOR,
                   localPageId,
                   data["backgroundColor"]));
-
             }
           }));
 
@@ -170,7 +162,7 @@ class P4DPageManager {
 
             // reuqest next
             if (null != data) {
-              print({
+              logger.i({
                 "method": "request",
                 "localPageId": localPageId,
                 "data": data
@@ -196,8 +188,6 @@ class P4DPageManager {
                 result["handshake"] = response.request.connectTimeout;
                 result["protocol"] = response.request.method;
 
-                // print(result);
-
                 if (response.statusMessage == "OK") {
                   onNetworkResult(localPageId, data["requestId"], SUCCESS,
                       jsonEncode(result));
@@ -205,26 +195,46 @@ class P4DPageManager {
                   onNetworkResult(
                       localPageId, data["requestId"], FAIL, jsonEncode(result));
                 }
-                // onNetworkResult(pageId, requestId, success, json)
               } catch (e) {
                 result["message"] = e.toString();
+                logger.e(jsonEncode(result));
                 onNetworkResult(
                     localPageId, data["requestId"], FAIL, jsonEncode(result));
               }
-              // EventManager.instance.sendMessage(what = EventManager.TYPE_NAVIGATION_BAR_TITLE, pageId = localPageId, obj = data.getString("title"))
-              // JSNetwork.request(Data)
             }
           }));
 
-      ///startPulldownRefresh
+      ///startPullDownRefresh
+      p4d.addCallback(DartCallback(
+          engine: engine,
+          name: 'startPullDownRefresh',
+          handler: (args, localEngine, thisVal) {
+            var localPageId = page.getProperty("pageId").toDartString();
+            logger.i("startPullDownRefresh");
+            EventManager.eventBus.fire(EventManager.sendMessage(
+                EventManager.TYPE_TOGGLE_PULL_DOWN_REFRESH, localPageId, true));
+          }));
+
       ///stopPullDownRefresh
+      p4d.addCallback(DartCallback(
+          engine: engine,
+          name: 'stopPullDownRefresh',
+          handler: (args, localEngine, thisVal) {
+            var localPageId = page.getProperty("pageId").toDartString();
+            logger.i("stopPullDownRefresh");
+            EventManager.eventBus.fire(EventManager.sendMessage(
+                EventManager.TYPE_TOGGLE_PULL_DOWN_REFRESH,
+                localPageId,
+                false));
+          }));
+
       ///hideLoading
       p4d.addCallback(DartCallback(
           engine: engine,
           name: 'hideLoading',
           handler: (args, localEngine, thisVal) {
             var localPageId = page.getProperty("pageId").toDartString();
-            print("hideLoading");
+            logger.i("hideLoading");
             EventManager.eventBus.fire(EventManager.sendMessage(
                 EventManager.TYPE_TOGGLE_LOADING, localPageId, false));
           }));
@@ -235,7 +245,7 @@ class P4DPageManager {
           name: 'showLoading',
           handler: (args, localEngine, thisVal) {
             var localPageId = page.getProperty("pageId").toDartString();
-            print("showLoading");
+            logger.i("showLoading");
             EventManager.eventBus.fire(EventManager.sendMessage(
                 EventManager.TYPE_TOGGLE_LOADING, localPageId, true));
           }));
@@ -246,8 +256,7 @@ class P4DPageManager {
           name: 'hideToast',
           handler: (args, localEngine, thisVal) {
             var localPageId = page.getProperty("pageId").toDartString();
-            print("hideToast");
-            print(args[0]);
+            logger.i("hideToast");
             EventManager.eventBus.fire(EventManager.sendMessage(
                 EventManager.TYPE_TOGGLE_TOAST, localPageId, {"show": false}));
           }));
@@ -258,13 +267,11 @@ class P4DPageManager {
           name: 'showToast',
           handler: (args, localEngine, thisVal) {
             var localPageId = page.getProperty("pageId").toDartString();
-            print("showToast");
-
+            logger.i("showToast");
             EventManager.eventBus.fire(EventManager.sendMessage(
-                EventManager.TYPE_TOGGLE_TOAST, localPageId, {
-              "show": true,
-              "message": engine.fromJSVal(args[0]).toString()
-            }));
+                EventManager.TYPE_TOGGLE_TOAST,
+                localPageId,
+                {"show": true, "message": engine.fromJSVal(args[0])["title"]}));
           }));
 
       ///setStorage
@@ -374,7 +381,7 @@ class P4DPageManager {
   }
 
   void onRefresh(String pageId, String json) {
-    // print({"pageId": pageId, "json": json});
+    // logger.i({"pageId": pageId, "json": json});
     EventManager.eventBus.fire(
         EventManager.sendMessage(EventManager.TYPE_REFRESH, pageId, json));
   }
@@ -440,7 +447,7 @@ class P4DPageManager {
     try {
       var engine = JSEngine.instance;
       // engine.global.getProperty("removePage").callJS([engine.toJSVal(pageId)]);
-      print("onRemovePage");
+      logger.i("onRemovePage");
       engine.evalScript("global.removePage($pageId)");
     } catch (e) {
       throw e;

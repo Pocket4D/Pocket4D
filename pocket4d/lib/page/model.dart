@@ -1,5 +1,6 @@
 import 'package:dva_dart/dva_dart.dart';
 import 'package:pocket4d/services/p4d_http.dart';
+import 'package:quickjs_dart/quickjs_dart.dart';
 
 import 'state.dart';
 
@@ -14,23 +15,18 @@ DvaModel p4dAppModel = DvaModel(
         return P4DAppState.loadJson(
             json: payload.payload["json"], indexPage: payload.payload["indexPage"]);
       },
-      'removeHandlerByPageId':(DvaState state, Payload<String> payload){
-        return P4DAppState.removeHandlerById(payload.payload);
-      }
     },
 // effects
     effects: {
       'getBundle': (Payload<Map<String, String>> payload) async* {
         String bundleApiUrl = payload.payload["bundleApiUrl"];
-        String indexKey = payload.payload["indexKey"];
         var result = await getBundle(url: bundleApiUrl);
         yield PutEffect(
             key: 'loadJson',
-            payload: Payload<Map<String, dynamic>>({"json": result, "indexPage": indexKey}));
+            payload: Payload<Map<String, dynamic>>({"json": result, "indexPage": result["indexKey"]}));
       },
-      'removeHandler':(Payload<String> payload) async* {
-        yield PutEffect(
-            key: 'removeHandlerByPageId',
-            payload: payload);
+      'requestAppList': (Payload<String> payload) async* {
+        var result = await requestAppList(payload.payload);
+        logger.i(result);
       },
     });

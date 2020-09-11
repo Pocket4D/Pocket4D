@@ -7,10 +7,9 @@ class EventManager {
   static const TYPE_NAVIGATE_TO = 3;
   static const TYPE_NAVIGATION_BAR_COLOR = 4;
   static const TYPE_BACKGROUND_COLOR = 5;
-  static const TYPE_START_PULL_DOWN_REFRESH = 6;
-  static const TYPE_STOP_PULL_DOWN_REFRESH = 7;
-  static const TYPE_TOGGLE_LOADING = 8;
-  static const TYPE_TOGGLE_TOAST = 9;
+  static const TYPE_TOGGLE_LOADING = 6;
+  static const TYPE_TOGGLE_TOAST = 7;
+  static const TYPE_TOGGLE_PULL_DOWN_REFRESH = 8;
 
 
   static final EventBus eventBus = EventBus(sync: true);
