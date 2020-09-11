@@ -1,14 +1,14 @@
 # pocket4d
 
 ## Env Requirement:
-[✓] Flutter (Channel stable, 1.20.3)
-[✓] Dart version 2.9.2
-[✓] Android toolchain
-[✓] Xcode 11.7
+* [✓] Flutter (Channel stable, 1.20.3)
+* [✓] Dart version 2.9.2
+* [✓] Android toolchain
+* [✓] Xcode 11.7
 
 ## Materials
-[✓] Pocket4d-cli
-[✓] Pocket4d-server
+* [✓] Pocket4d-cli
+* [✓] Pocket4d-server
 
 ## Quick Start
 1. Build and Run `Pocket4d-server`
