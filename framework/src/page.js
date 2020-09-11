@@ -7,7 +7,7 @@ global.callbackArgs = {};
 function loadPage(pageId) {
 	if (!pageId) return;
 
-	function DP(pageId) {
+	function P4D(pageId) {
 		this.pageId = pageId;
 
 		this.requestData = {};
@@ -15,8 +15,8 @@ function loadPage(pageId) {
 		this.onNetworkResult = function (requestId, result, json) {
 			let req = this.requestData[requestId];
 			if (req) {
-				if (result === 'sudpess') {
-					req['sudpess'](JSON.parse(json));
+				if (result === 'success') {
+					req['success'](JSON.parse(json));
 				} else {
 					req['fail'](JSON.parse(json));
 				}
@@ -31,10 +31,10 @@ function loadPage(pageId) {
 
 		this.pageId = pageId;
 
-		this.dp = new DP(pageId);
+		this.p4d = new P4D(pageId);
 
-		// 需要加这一行赋值，不然在模板使用dp.调用不到
-		let dp = this.dp;
+		// 需要加这一行赋值，不然在模板使用p4d.调用不到
+		let p4d = this.p4d;
 
 		this.__native__evalInPage = function (jsContent) {
 			if (!jsContent) {
