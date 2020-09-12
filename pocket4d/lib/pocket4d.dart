@@ -24,15 +24,13 @@ export './page/state.dart';
 export 'store.dart';
 
 class P4D extends StatelessWidget {
-  final DvaStore store;
   final String bundleApiUrl;
-  P4D({this.store, this.bundleApiUrl});
+  P4D({this.bundleApiUrl});
 
   @override
   Widget build(BuildContext context) {
-
-    return P4DIndex(bundleApiUrl: bundleApiUrl);
-  }
+    return P4DIndex(bundleApiUrl:bundleApiUrl);
+   }
 }
 
 class P4DIndex extends StatefulWidget {
@@ -67,7 +65,7 @@ class _P4DIndexState extends State<P4DIndex> {
     });
   }
 
-  renderBundleList() {
+  renderBundleList(BuildContext context) {
     return _bundleList.map((element) {
       return InkWell(
           onTap: () {
@@ -75,10 +73,7 @@ class _P4DIndexState extends State<P4DIndex> {
             var newBundleUrl="${widget.bundleApiUrl}/${element.appId}/${element.name}";
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) =>
-                    DvaProvider<DvaStore>(
-                      child: P4DApp(newBundleUrl),
-                      store: store,
-                    )));
+                    P4DApp(newBundleUrl)));
           },
           child: Container(
             padding: EdgeInsets.all(16),
@@ -102,7 +97,7 @@ class _P4DIndexState extends State<P4DIndex> {
             child: SingleChildScrollView(
                 child: ListBody(
       children: _bundleList.length > 0
-          ? renderBundleList()
+          ? renderBundleList(context)
           : [Text("No App At the moment")],
     ))));
   }

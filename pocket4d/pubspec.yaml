@@ -14,7 +14,7 @@ dependencies:
   event_bus: ^1.1.1
   dva_dart: ^0.1.1
   dva_flutter: ^0.1.1
-  flutter_downloader: ^1.4.1
+  # flutter_downloader: ^1.4.1
   path_provider: ^1.6.0
   dio: ^3.0.10
   uuid: ^2.2.2
