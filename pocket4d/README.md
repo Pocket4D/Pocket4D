@@ -6,15 +6,15 @@
 * [✓] Android toolchain
 * [✓] Xcode 11.7
 
-## Materials
-* [✓] Pocket4d-cli
-* [✓] Pocket4d-server
+### Materials
+* [✓] Pocket4d-Cli: [repo](https://github.com/Pocket4D/Pocket4D-Cli)
+* [✓] Pocket4d-Server: [repo](https://github.com/Pocket4D/Pocket4D-Server)
 
-## Quick Start
+### Steps
 1. Build and Run `Pocket4d-server`
     * git clone
     ```bash
-        git clone https://github.com/FireStack-Lab/pocket4D-server 
+        git clone https://github.com/Pocket4D/Pocket4D-Server 
     ```
     * create a folder name `bundled`, build and run the `./pocket4d-server`
     
@@ -27,7 +27,7 @@
 2. Edit `html` `css` and build with `Pocket4d-cli`
     * git clone `pocket4d-cli`
         ```bash
-           git clone https://github.com/FireStack-Lab/Pocket4D-cli 
+           git clone https://github.com/Pocket4D/Pocket4D-Cli 
         ```
     * open `src` folder start edit `*.html`,`*.css` and `*.config`, remember to edit `app.config`, with pages config
     * build bundle json

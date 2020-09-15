@@ -49,7 +49,7 @@
 * [✓] Xcode 11.7
 
 ### Materials
-* [✓] Pocket4d-Cli: [repo](https://github.com/Pocket4D-Lab/Pocket4D-Cli)
+* [✓] Pocket4d-Cli: [repo](https://github.com/Pocket4D/Pocket4D-Cli)
 * [✓] Pocket4d-Server: [repo](https://github.com/Pocket4D/Pocket4D-Server)
 
 ### Steps
@@ -69,7 +69,7 @@
 2. Edit `html` `css` and build with `Pocket4d-cli`
     * git clone `pocket4d-cli`
         ```bash
-           git clone https://github.com/Pocket4D-Lab/Pocket4D-Cli 
+           git clone https://github.com/Pocket4D/Pocket4D-Cli 
         ```
     * open `src` folder start edit `*.html`,`*.css` and `*.config`, remember to edit `app.config`, with pages config
     * build bundle json
