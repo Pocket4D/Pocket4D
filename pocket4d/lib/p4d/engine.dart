@@ -7,7 +7,7 @@ import 'page_manager.dart';
 
 
 
-class P4DEngine {
+class P4DEngine{
   JSEngine _jsEngine;
   String errorTag = '< PocketEngine Error >';
 
@@ -26,19 +26,21 @@ class P4DEngine {
   /// engine start
   P4DEngine.start() {
     _jsEngine = JSEngine();
-    if (_jsEngine.runtime.address is int && _jsEngine.context.address is int) {
-      _isAlive = true;
-      _init();
-      initMiniApp();
-    } else {
-      throw '$errorTag : JSRuntime init failed';
-    }
+    _isAlive = true;
+    _init();
+    initMiniApp();
   }
 
   /// engine stop
   P4DEngine.stop() {
     _isAlive = false;
     dispose();
+  }
+
+  P4DEngine.loop(){
+    if(_isAlive == true){
+      JSEngine.loop(_jsEngine);
+    }
   }
 
   /// provide dispose when widget disposed
@@ -58,6 +60,7 @@ class P4DEngine {
   loadFrameWork([String frameworkString = framework]) {
     try {
       var _framework = JSEngine.instance.evalScript(frameworkString);
+      print(_framework.isValid());
       if (_framework.isValid()) {
         _frameworkLoaded = true;
       } else {

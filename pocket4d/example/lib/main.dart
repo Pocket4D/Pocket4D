@@ -8,6 +8,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   P4DEngine.start();
   runApp(MyApp());
+  P4DEngine.loop();
 }
 
 class MyApp extends StatefulWidget {
@@ -25,7 +26,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
 
     // var url = Platform.isAndroid ? "10.0.2.2" : "127.0.0.1";
-    var url = "192.168.3.11";
+    var url = "localhost";
     return  DvaProvider<DvaStore>(
       child:MaterialApp(
         home: P4D(

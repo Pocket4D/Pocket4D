@@ -31,6 +31,7 @@ class P4DPageManager {
 
   void _attachPage(String pageId, String script) {
     var engine = JSEngine.instance;
+
     engine.global.getProperty("loadPage").callJS([engine.toJSVal(pageId)]);
     // might be using eval
     var realPageObject = _getJSPage(pageId);
