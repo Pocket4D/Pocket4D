@@ -1,49 +1,56 @@
-require('./observer');
+import { getExpValue, guid, judgeIsNotNull } from './framework';
+import { Observer, Watcher } from './observer';
 
-global.pages = {};
-global.callbacks = {};
-global.callbackArgs = {};
-
-function loadPage(pageId) {
+function loadPage(pageId?: string) {
 	if (!pageId) return;
 
-	function P4D(pageId) {
-		this.pageId = pageId;
-
-		this.requestData = {};
-
-		this.onNetworkResult = function (requestId, result, json) {
+	class P4D {
+		pageId?: string;
+		requestData: any;
+		constructor(pageId?: string) {
+			this.pageId = pageId;
+			this.requestData = {};
+		}
+		onNetworkResult(requestId: string, result: any, json: any) {
 			let req = this.requestData[requestId];
+			let resultJson = JSON.parse(json);
 			if (req) {
 				if (result === 'success') {
-					req['success'](JSON.parse(json));
+					req['success'](resultJson);
 				} else {
-					req['fail'](JSON.parse(json));
+					req['fail'](resultJson);
 				}
 				req['complete']();
 			}
-		};
+		}
 	}
+	class RealPage {
+		pageId: string;
+		observer: Observer;
+		p4d: P4D;
+		data: any;
+		__native__refresh: any;
+		__native__setTimeout: any;
 
-	// __native__ 开头是内部方法，避免与外部冲突
-	function RealPage(pageId) {
-		this.observer = new Observer();
-
-		this.pageId = pageId;
-
-		this.p4d = new P4D(pageId);
-
-		// 需要加这一行赋值，不然在模板使用p4d.调用不到
-		let p4d = this.p4d;
-
-		this.__native__evalInPage = function (jsContent) {
+		constructor(pageId: string) {
+			this.pageId = pageId;
+			this.observer = new Observer();
+			this.p4d = new P4D(pageId);
+			let p4d = this.p4d;
+		}
+		__native__evalInPage(jsContent?: any) {
 			if (!jsContent) {
 				console.log('js content is empty!');
 			}
 			eval(jsContent);
-		};
-
-		this.__native__getExpValue = function (id, type, prefix, watch, script) {
+		}
+		__native__getExpValue(
+			id: string,
+			type: string,
+			prefix: string,
+			watch: boolean,
+			script: string
+		) {
 			if (watch === true) {
 				let watcher = new Watcher(id, type, prefix, script);
 				this.observer.currentWatcher = watcher;
@@ -54,13 +61,12 @@ function loadPage(pageId) {
 				this.observer.currentWatcher = undefined;
 			}
 			return value;
-		};
-
-		this.__native__initComplete = function () {
+		}
+		__native__initComplete() {
 			this.observer.observe(this.data);
-		};
+		}
 
-		this.setData = function (dataObj) {
+		setData(dataObj: { [key: string]: any }) {
 			console.log('call setData');
 			for (let key in dataObj) {
 				let str = 'this.data.' + key + " = dataObj['" + key + "']";
@@ -73,13 +79,13 @@ function loadPage(pageId) {
 			if (needUpdateMapping) {
 				this.__native__refresh(needUpdateMapping);
 			}
-		};
+		}
 
-		this.__native__removeObserverByIds = function (ids) {
+		__native__removeObserverByIds(ids: string[]) {
 			this.observer.removeWatcher(ids);
-		};
+		}
 
-		function setTimeout(callback, ms, ...args) {
+		setTimeout(callback: any, ms: number, ...args: any[]) {
 			let timerId = guid();
 			callbacks[timerId] = callback;
 			callbackArgs[timerId] = args;
@@ -87,7 +93,7 @@ function loadPage(pageId) {
 			return timerId;
 		}
 
-		function clearTimeout(timerId) {
+		clearTimeout(timerId: string | number) {
 			let callback = callbacks[timerId];
 			if (callback) {
 				callbacks[timerId] = undefined;
@@ -96,7 +102,7 @@ function loadPage(pageId) {
 			__native__clearTimeout(timerId);
 		}
 
-		function setInterval(callback, ms, ...args) {
+		setInterval(callback: any, ms: number, ...args: any[]) {
 			let timerId = guid();
 			callbacks[timerId] = callback;
 			callbackArgs[timerId] = args;
@@ -104,7 +110,7 @@ function loadPage(pageId) {
 			return timerId;
 		}
 
-		function clearInterval(timerId) {
+		clearInterval(timerId: string | number) {
 			let callback = callbacks[timerId];
 			if (callback) {
 				callbacks[timerId] = undefined;
@@ -118,7 +124,7 @@ function loadPage(pageId) {
 	cachePage(pageId, pageObj);
 }
 
-function cachePage(pageId, page) {
+function cachePage(pageId: string, page: any) {
 	if (page) {
 		pages[pageId] = page;
 	} else {
@@ -126,11 +132,11 @@ function cachePage(pageId, page) {
 	}
 }
 
-function removePage(pageId) {
-	pages[pageId] = undefined;
+function removePage(pageId: string) {
+	globalThis.pages[pageId] = undefined;
 }
 
-function callback(callbackId) {
+function callback(callbackId: string) {
 	let callback = callbacks[callbackId];
 	if (callback) {
 		let args = callbackArgs[callbackId];
@@ -140,15 +146,24 @@ function callback(callbackId) {
 	}
 }
 
-global.getPage = function (pageId) {
-	return pages[pageId];
-};
-
-global.Page = function (obj) {
+function Page(obj: any) {
 	// 这里的page是个临时变量
-	global.page = obj;
-};
+	globalThis.page = obj;
+}
 
-global.loadPage = loadPage;
-global.callback = callback;
-global.removePage = removePage;
+function getPage(pageId: string) {
+	return pages[pageId];
+}
+
+globalThis.page = undefined;
+globalThis.pages = undefined;
+globalThis.callbacks = {};
+globalThis.callbackArgs = {};
+globalThis.getPage = getPage;
+globalThis.Page = Page;
+globalThis.loadPage = loadPage;
+globalThis.callback = callback;
+globalThis.removePage = removePage;
+globalThis.guid = guid;
+globalThis.judgeIsNotNull = judgeIsNotNull;
+globalThis.getExpValue = getExpValue;

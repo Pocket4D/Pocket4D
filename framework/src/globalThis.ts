@@ -1,0 +1,16 @@
+declare var page: any;
+declare var pages: any;
+declare var callbacks: { [key: string]: any };
+declare var callbackArgs: { [key: string]: any };
+declare var __native__setTimeout: Function;
+declare var __native__setInterval: Function;
+declare var __native__clearTimeout: Function;
+declare var __native__clearInterval: Function;
+declare var getPage: Function;
+declare var Page: Function;
+declare var loadPage: Function;
+declare var callback: Function;
+declare var removePage: Function;
+declare var guid: Function;
+declare var judgeIsNotNull: Function;
+declare var getExpValue: Function;

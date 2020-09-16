@@ -1,21 +1,17 @@
-/**
- * 观察者，用于观察data对象属性变化
- * @param data
- * @constructor
- */
-class Observer {
+import { getExpValue } from './framework';
+
+export class Observer {
+	currentWatcher?: Watcher;
+	collectors: WatcherCollector[];
+	watchers: { [key: string]: Watcher[] | undefined };
+	assembler: Assembler;
 	constructor() {
 		this.currentWatcher = undefined;
 		this.collectors = [];
 		this.watchers = {};
 		this.assembler = new Assembler();
 	}
-
-	/**
-	 * 将data的属性变成可响应对象，为了监听变化回调
-	 * @param data
-	 */
-	observe(data) {
+	observe(data: { [key: string]: any }) {
 		if (!data || data === undefined || typeof data !== 'object') {
 			return;
 		}
@@ -29,7 +25,7 @@ class Observer {
 		}
 	}
 
-	defineReactive(data, key, val) {
+	defineReactive(data: { [key: string]: any }, key: string, val: any) {
 		const property = Object.getOwnPropertyDescriptor(data, key);
 		if (property && property.configurable === false) {
 			return;
@@ -70,19 +66,19 @@ class Observer {
 		});
 	}
 
-	addWatcher(watcher) {
+	addWatcher(watcher: Watcher) {
 		if (this.watchers[watcher.id] === undefined) {
 			this.watchers[watcher.id] = [];
 		}
-		this.watchers[watcher.id].push(watcher);
+		this.watchers[watcher.id]?.push(watcher);
 	}
 
-	removeWatcher(ids) {
+	removeWatcher(ids?: string[]) {
 		if (ids) {
-			let keys = [];
+			let keys: any[] = [];
 			ids.forEach((id) => {
-				if (this.watchers[id]) {
-					this.watchers[id].forEach((watcher) => {
+				if (this.watchers[id] !== undefined) {
+					this.watchers[id]?.forEach((watcher) => {
 						keys.push(watcher.key());
 					});
 					this.watchers[id] = undefined;
@@ -103,8 +99,10 @@ class Observer {
  * watcher收集器，收集订阅的容器，用于增减观察者队列中的观察者，并发布更新通知
  * @constructor
  */
-class WatcherCollector {
-	constructor(observer) {
+export class WatcherCollector {
+	observer: Observer;
+	watchers: { [key: string]: Watcher | undefined };
+	constructor(observer: Observer) {
 		this.observer = observer;
 		this.watchers = {};
 	}
@@ -112,12 +110,12 @@ class WatcherCollector {
 	/**
 	 * 将当前的Watcher与对应的Data变量关联起来
 	 */
-	addWatcher(watcher) {
+	addWatcher(watcher: Watcher) {
 		// console.log("watcher key = " + watcher.key());
 		this.watchers[watcher.key()] = watcher;
 	}
 
-	removeWatcher(key) {
+	removeWatcher(key: string) {
 		if (this.watchers[key]) {
 			// console.log("delete sub key = " + key);
 			delete this.watchers[key];
@@ -127,11 +125,13 @@ class WatcherCollector {
 	/**
 	 * 通知所有订阅者，同时把当前Dep持有的所有订阅者的映射数组（id-表达式）添加到组装者中，等待组装
 	 */
-	notify(data) {
+	notify(data: any) {
 		for (const _k in this.watchers) {
 			let watcher = this.watchers[_k];
-			watcher.value = getExpValue(data, watcher.script);
-			this.observer.assembler.addPackagingObject(watcher.format());
+			if (watcher) {
+				watcher.value = getExpValue(data, watcher.script);
+				this.observer.assembler.addPackagingObject(watcher.format());
+			}
 		}
 	}
 }
@@ -140,8 +140,14 @@ class WatcherCollector {
  * 订阅者，用于响应观察者的变化
  * @constructor
  */
-class Watcher {
-	constructor(id, type, prefix, script) {
+export class Watcher {
+	id: string;
+	type: string;
+	prefix: string;
+	script?: string;
+	value: {};
+
+	constructor(id: string, type: string, prefix: string, script?: string) {
 		this.id = id;
 		this.type = type;
 		this.script = script;
@@ -150,7 +156,7 @@ class Watcher {
 	}
 
 	format() {
-		let obj = {};
+		let obj: any = {};
 		obj.id = this.id;
 		obj.type = this.type;
 		// obj.script = this.script;
@@ -170,11 +176,12 @@ class Watcher {
  * @constructor
  */
 class Assembler {
+	packagingArray: any[];
 	constructor() {
 		this.packagingArray = [];
 	}
 
-	addPackagingObject(item) {
+	addPackagingObject(item: any) {
 		this.packagingArray.push(item);
 	}
 
@@ -194,6 +201,3 @@ class Assembler {
 		return result;
 	}
 }
-
-global.Observer = Observer;
-global.Watcher = Watcher;
