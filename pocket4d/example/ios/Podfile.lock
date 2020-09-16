@@ -2,12 +2,14 @@ PODS:
   - Flutter (1.0.0)
   - fluttertoast (0.0.2):
     - Flutter
+    - Toast
   - path_provider (0.0.1):
     - Flutter
   - pocket4d (0.0.1):
     - Flutter
   - quickjs_dart (0.0.1):
     - Flutter
+  - Toast (4.0.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -15,6 +17,10 @@ DEPENDENCIES:
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - pocket4d (from `.symlinks/plugins/pocket4d/ios`)
   - quickjs_dart (from `.symlinks/plugins/quickjs_dart/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Toast
 
 EXTERNAL SOURCES:
   Flutter:
@@ -30,10 +36,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
+  fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   pocket4d: 162c7d142344563bb8917f0fbd1da17a69f41668
-  quickjs_dart: e4c9c9103fb363191df775f9d0afc72519beb5c2
+  quickjs_dart: 00c3f04c0027a460fb2a67e7d740588fe4dadcf0
+  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
