@@ -1,21 +1,19 @@
 library pocket4d;
 
-import 'package:dio/dio.dart';
 import 'package:dva_dart/dva_dart.dart';
 import 'package:dva_flutter/dva_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:pocket4d/page/app.dart';
-import 'package:pocket4d/services/p4d_http.dart';
-import 'package:pocket4d/store.dart';
-import 'package:quickjs_dart/quickjs_dart.dart';
+import 'package:thrio/thrio.dart';
 
-import 'bean/bundleItem.dart';
+import 'store.dart';
+import 'routes/module.dart' as routes;
 
 export './p4d/engine.dart';
 export './p4d/event_manager.dart';
 export './p4d/framework.dart';
 export './p4d/page_manager.dart';
 export './p4d/view_controller.dart';
+export './p4d/p4d.dart';
 export './page/app.dart';
 export './page/container.dart';
 export './page/model.dart';
@@ -23,82 +21,74 @@ export './page/page.dart';
 export './page/state.dart';
 export 'store.dart';
 
-class P4D extends StatelessWidget {
-  final String bundleApiUrl;
-  P4D({this.bundleApiUrl});
+class GlobalStore extends StatefulWidget {
+  final String entrypoint;
+
+  const GlobalStore({this.entrypoint = ''});
 
   @override
-  Widget build(BuildContext context) {
-    return P4DIndex(bundleApiUrl:bundleApiUrl);
-   }
+  _GlobalStoreState createState() => _GlobalStoreState();
 }
 
-class P4DIndex extends StatefulWidget {
-  final String bundleApiUrl;
-
-  P4DIndex({this.bundleApiUrl});
-
-  @override
-  _P4DIndexState createState() => _P4DIndexState();
-}
-
-class _P4DIndexState extends State<P4DIndex> {
-  List<BundleItem> _bundleList = [];
-
+class _GlobalStoreState extends State<GlobalStore> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    fetchAppList(widget.bundleApiUrl);
-  }
-
-  fetchAppList(String url) async {
-    Response<dynamic> result = await requestAppList(url);
-    List<BundleItem> newList = [];
-    if (result.data is List<dynamic>) {
-      for (var data in result.data) {
-        newList.add(BundleItem.fromJson(data));
-      }
-    }
-    setState(() {
-      _bundleList = newList;
-    });
-  }
-
-  renderBundleList(BuildContext context) {
-    return _bundleList.map((element) {
-      return InkWell(
-          onTap: () {
-            logger.i(element.appId);
-            var newBundleUrl="${widget.bundleApiUrl}/${element.appId}/${element.name}";
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) =>
-                    P4DApp(newBundleUrl)));
-          },
-          child: Container(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text(element.name,style: TextStyle(fontSize: 18),),
-              Text(element.appId,style: TextStyle(fontSize: 12),),
-            ],),
-            height: 100,
-          ));
-    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Scaffold(
-        body: SafeArea(
-            child: SingleChildScrollView(
-                child: ListBody(
-      children: _bundleList.length > 0
-          ? renderBundleList(context)
-          : [Text("No App At the moment")],
-    ))));
+    return DvaProvider<DvaStore>(
+      child: MainApp(
+        entrypoint: widget.entrypoint,
+      ),
+      store: store,
+    );
   }
+}
+
+class MainApp extends StatefulWidget {
+  const MainApp({Key key, String entrypoint = ''})
+      : _entrypoint = entrypoint,
+        super(key: key);
+
+  final String _entrypoint;
+
+  @override
+  _MainAppState createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> with ThrioModule {
+  @override
+  void initState() {
+    super.initState();
+
+    registerModule(this);
+    initModule();
+  }
+
+  @override
+  void onModuleRegister() {
+    registerModule(routes.Module());
+  }
+
+  @override
+  void onModuleInit() {
+    navigatorLogging = true;
+  }
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+        child: MaterialApp(
+          builder: ThrioNavigator.builder(entrypoint: widget._entrypoint),
+          navigatorObservers: [],
+          home: NavigatorHome(),
+          theme: ThemeData(
+            pageTransitionsTheme: const PageTransitionsTheme(builders: {
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            }),
+          ),
+        ),
+      );
 }

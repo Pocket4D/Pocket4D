@@ -9,20 +9,24 @@ import 'package:pocket4d/ui/ui_factory.dart';
 import 'package:pocket4d/util/base64.dart';
 import 'package:pocket4d/util/color_util.dart';
 import 'package:quickjs_dart/quickjs_dart.dart';
+import 'package:thrio/thrio.dart';
 
 import 'abstract.dart';
 
 class P4DPage extends StatefulWidget {
+  final String appId;
+  final String name;
   final Map<String, dynamic> args;
   final Map<String, dynamic> pages;
   final Map<String, dynamic> handlers;
   final String indexPage;
+  final String bundleApiUrl;
 
-  P4DPage(this.args, this.pages, this.handlers, this.indexPage);
+  P4DPage(this.bundleApiUrl, this.appId, this.name, this.args, this.pages, this.handlers,
+      this.indexPage);
 
   @override
-  _P4DPageState createState() =>
-      _P4DPageState(args, pages, handlers, indexPage);
+  _P4DPageState createState() => _P4DPageState(args, pages, handlers, indexPage);
 }
 
 class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
@@ -53,7 +57,7 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
   _P4DPageState(this._args, this._pages, this._handlers, this._indexPage) {
     if (_args.containsKey("pageCode")) {
       _pageCode = _args['pageCode'];
-      _args = _args['args'];
+      _args = Map<String, dynamic>.from(_args['args']);
     } else {
       _pageCode = _indexPage;
     }
@@ -77,7 +81,7 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
       var content = message['content'];
       _pages.putIfAbsent(pageCode, () => content);
       _handlers.forEach((k, v) {
-        if (k.startsWith(pageCode)) {
+        if (pageCode != null && k.startsWith(pageCode)) {
           logger.i(message);
           v.onMessage(message);
         }
@@ -120,8 +124,7 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
 
   void _setBackgroundColor(Map<String, dynamic> map) {
     setState(() {
-      _backgroundColor =
-          parseColor(map['message'], defaultValue: Colors.grey[200]);
+      _backgroundColor = parseColor(map['message'], defaultValue: Colors.grey[200]);
     });
   }
 
@@ -136,10 +139,15 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
         var args = Map<String, dynamic>()
           ..putIfAbsent("pageCode", () => path)
           ..putIfAbsent("args", () => params);
-
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) =>
-                P4DPage(args, _pages, _handlers, _indexPage)));
+        // Navigator.of(context).push(MaterialPageRoute(
+        //     builder: (context) =>
+        //         P4DPage(widget.appId, widget.name, args, _pages, _handlers, _indexPage)));
+        ThrioNavigator.push(url: '/p4d', params: {
+          "AppId": widget.appId,
+          "Name": widget.name,
+          "args": args,
+          "endpoint": widget.bundleApiUrl
+        });
       }
     }
   }
@@ -169,10 +177,8 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
       return;
     }
     _title = config['navigationBarTitleText'];
-    _appBarColor = parseColor(config['navigationBarBackgroundColor'],
-        defaultValue: Colors.blue);
-    _backgroundColor =
-        parseColor(config['backgroundColor'], defaultValue: Colors.grey[200]);
+    _appBarColor = parseColor(config['navigationBarBackgroundColor'], defaultValue: Colors.blue);
+    _backgroundColor = parseColor(config['backgroundColor'], defaultValue: Colors.grey[200]);
     _enablePullDownRefresh = config['enablePullDownRefresh'];
   }
 
@@ -196,7 +202,6 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
         _refreshIndicatorKey.currentState.show();
       }
     } else {
-
       if (null != _completer) {
         _completer.complete(true);
       }
@@ -238,12 +243,9 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
   Widget build(BuildContext context) {
     var child = _tree;
     if (_loading == false) {
-      if (null != _enablePullDownRefresh &&
-          _enablePullDownRefresh &&
-          null != _tree) {
+      if (null != _enablePullDownRefresh && _enablePullDownRefresh && null != _tree) {
         _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-        child = RefreshIndicator(
-            key: _refreshIndicatorKey, onRefresh: _onRefresh, child: _tree);
+        child = RefreshIndicator(key: _refreshIndicatorKey, onRefresh: _onRefresh, child: _tree);
       }
     } else {
       child = Center(child: Text("Global Loading..."));
@@ -252,10 +254,15 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
     return Scaffold(
         key: PageStorageKey(_tree),
         appBar: AppBar(
-          title: Text(_title),
-          centerTitle: true,
-          backgroundColor: _appBarColor,
-        ),
+            title: Text(_title),
+            centerTitle: true,
+            backgroundColor: _appBarColor,
+            leading: const IconButton(
+              color: Colors.white,
+              tooltip: 'back',
+              icon: Icon(Icons.arrow_back),
+              onPressed: ThrioNavigator.pop,
+            )),
         backgroundColor: _backgroundColor,
         body: child);
   }
@@ -263,9 +270,7 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
   @override
   void initState() {
     super.initState();
-    _sub = EventManager.eventBus
-        .on<Map<String, dynamic>>()
-        .listen(_initMessageHandler);
+    _sub = EventManager.eventBus.on<Map<String, dynamic>>().listen(_initMessageHandler);
     _data = jsonDecode(_pages[_pageCode]);
     _create();
   }

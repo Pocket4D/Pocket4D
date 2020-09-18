@@ -1,13 +1,10 @@
 import 'dart:core';
-import 'package:event_bus/event_bus.dart';
 import 'package:quickjs_dart/quickjs_dart.dart';
 import 'package:pocket4d/p4d/framework.dart';
 
 import 'page_manager.dart';
 
-
-
-class P4DEngine{
+class P4DEngine {
   JSEngine _jsEngine;
   String errorTag = '< PocketEngine Error >';
 
@@ -21,7 +18,6 @@ class P4DEngine{
   bool get isAlive => _isAlive;
 
   P4DPageManager manager;
-  
 
   /// engine start
   P4DEngine.start() {
@@ -37,8 +33,8 @@ class P4DEngine{
     dispose();
   }
 
-  P4DEngine.loop(){
-    if(_isAlive == true){
+  P4DEngine.loop() {
+    if (_isAlive == true) {
       JSEngine.loop(_jsEngine);
     }
   }
@@ -52,7 +48,7 @@ class P4DEngine{
     registerDartGlobal();
   }
 
-  initMiniApp(){
+  initMiniApp() {
     loadFrameWork();
     runPageManager();
   }
@@ -60,7 +56,7 @@ class P4DEngine{
   loadFrameWork([String frameworkString = framework]) {
     try {
       var _framework = JSEngine.instance.evalScript(frameworkString);
-      print(_framework.isValid());
+      print(_framework.valueType);
       if (_framework.isValid()) {
         _frameworkLoaded = true;
       } else {

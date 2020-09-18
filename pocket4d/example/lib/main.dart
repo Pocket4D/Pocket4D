@@ -24,21 +24,15 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
     // var url = Platform.isAndroid ? "10.0.2.2" : "127.0.0.1";
-    var url = "localhost";
-    return  DvaProvider<DvaStore>(
-      child:MaterialApp(
+    var url = "http://localhost";
+    return DvaProvider<DvaStore>(
+      child: MaterialApp(
         home: P4D(
-          bundleApiUrl: "http://$url:3001/api/v1/bundled",
+          bundleApiUrl: "$url:3001/api/v1/bundled",
         ),
       ),
       store: store,
-    );
-      MaterialApp(
-      home: P4D(
-        bundleApiUrl: "http://$url:3001/api/v1/bundled",
-      ),
     );
   }
 }

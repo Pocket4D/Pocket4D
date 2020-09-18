@@ -31,17 +31,13 @@ class P4DPageManager {
 
   void _attachPage(String pageId, String script) {
     var engine = JSEngine.instance;
-
     engine.global.getProperty("loadPage").callJS([engine.toJSVal(pageId)]);
+
     // might be using eval
     var realPageObject = _getJSPage(pageId);
     realPageObject.engine = engine;
-    if (null != realPageObject &&
-        realPageObject is JSValue &&
-        !realPageObject.isUndefined()) {
-      realPageObject
-          .getProperty("__native__evalInPage")
-          .callJS([engine.toJSVal(script)]);
+    if (null != realPageObject && realPageObject is JSValue && !realPageObject.isUndefined()) {
+      realPageObject.getProperty("__native__evalInPage").callJS([engine.toJSVal(script)]);
 
       var rawPage = engine.evalScript("global.page");
       var page = _setProtoType(rawPage, realPageObject);
@@ -78,9 +74,7 @@ class P4DPageManager {
                 "data": data["title"]
               });
               EventManager.eventBus.fire(EventManager.sendMessage(
-                  EventManager.TYPE_NAVIGATION_BAR_TITLE,
-                  localPageId,
-                  data["title"]));
+                  EventManager.TYPE_NAVIGATION_BAR_TITLE, localPageId, data["title"]));
             }
           }));
 
@@ -98,9 +92,7 @@ class P4DPageManager {
                 "data": data["backgroundColor"]
               });
               EventManager.eventBus.fire(EventManager.sendMessage(
-                  EventManager.TYPE_NAVIGATION_BAR_TITLE,
-                  localPageId,
-                  data["backgroundColor"]));
+                  EventManager.TYPE_NAVIGATION_BAR_TITLE, localPageId, data["backgroundColor"]));
             }
           }));
 
@@ -118,9 +110,7 @@ class P4DPageManager {
                 "data": data["backgroundColor"]
               });
               EventManager.eventBus.fire(EventManager.sendMessage(
-                  EventManager.TYPE_BACKGROUND_COLOR,
-                  localPageId,
-                  data["backgroundColor"]));
+                  EventManager.TYPE_BACKGROUND_COLOR, localPageId, data["backgroundColor"]));
             }
           }));
 
@@ -137,9 +127,7 @@ class P4DPageManager {
                 jsonObject.putIfAbsent(element, () => data[element]);
               });
               EventManager.eventBus.fire(EventManager.sendMessage(
-                  EventManager.TYPE_NAVIGATE_TO,
-                  localPageId,
-                  jsonEncode(jsonObject)));
+                  EventManager.TYPE_NAVIGATE_TO, localPageId, jsonEncode(jsonObject)));
             }
           }));
 
@@ -163,11 +151,7 @@ class P4DPageManager {
 
             // reuqest next
             if (null != data) {
-              logger.i({
-                "method": "request",
-                "localPageId": localPageId,
-                "data": data
-              });
+              logger.i({"method": "request", "localPageId": localPageId, "data": data});
               var result = Map();
               result["code"] = -1;
               result["message"] = "";
@@ -190,17 +174,14 @@ class P4DPageManager {
                 result["protocol"] = response.request.method;
 
                 if (response.statusMessage == "OK") {
-                  onNetworkResult(localPageId, data["requestId"], SUCCESS,
-                      jsonEncode(result));
+                  onNetworkResult(localPageId, data["requestId"], SUCCESS, jsonEncode(result));
                 } else {
-                  onNetworkResult(
-                      localPageId, data["requestId"], FAIL, jsonEncode(result));
+                  onNetworkResult(localPageId, data["requestId"], FAIL, jsonEncode(result));
                 }
               } catch (e) {
                 result["message"] = e.toString();
                 logger.e(jsonEncode(result));
-                onNetworkResult(
-                    localPageId, data["requestId"], FAIL, jsonEncode(result));
+                onNetworkResult(localPageId, data["requestId"], FAIL, jsonEncode(result));
               }
             }
           }));
@@ -224,9 +205,7 @@ class P4DPageManager {
             var localPageId = page.getProperty("pageId").toDartString();
             logger.i("stopPullDownRefresh");
             EventManager.eventBus.fire(EventManager.sendMessage(
-                EventManager.TYPE_TOGGLE_PULL_DOWN_REFRESH,
-                localPageId,
-                false));
+                EventManager.TYPE_TOGGLE_PULL_DOWN_REFRESH, localPageId, false));
           }));
 
       ///hideLoading
@@ -236,8 +215,8 @@ class P4DPageManager {
           handler: (args, localEngine, thisVal) {
             var localPageId = page.getProperty("pageId").toDartString();
             logger.i("hideLoading");
-            EventManager.eventBus.fire(EventManager.sendMessage(
-                EventManager.TYPE_TOGGLE_LOADING, localPageId, false));
+            EventManager.eventBus.fire(
+                EventManager.sendMessage(EventManager.TYPE_TOGGLE_LOADING, localPageId, false));
           }));
 
       ///showLoading
@@ -247,8 +226,8 @@ class P4DPageManager {
           handler: (args, localEngine, thisVal) {
             var localPageId = page.getProperty("pageId").toDartString();
             logger.i("showLoading");
-            EventManager.eventBus.fire(EventManager.sendMessage(
-                EventManager.TYPE_TOGGLE_LOADING, localPageId, true));
+            EventManager.eventBus.fire(
+                EventManager.sendMessage(EventManager.TYPE_TOGGLE_LOADING, localPageId, true));
           }));
 
       ///hideToast
@@ -269,10 +248,8 @@ class P4DPageManager {
           handler: (args, localEngine, thisVal) {
             var localPageId = page.getProperty("pageId").toDartString();
             logger.i("showToast");
-            EventManager.eventBus.fire(EventManager.sendMessage(
-                EventManager.TYPE_TOGGLE_TOAST,
-                localPageId,
-                {"show": true, "message": engine.fromJSVal(args[0])["title"]}));
+            EventManager.eventBus.fire(EventManager.sendMessage(EventManager.TYPE_TOGGLE_TOAST,
+                localPageId, {"show": true, "message": engine.fromJSVal(args[0])["title"]}));
           }));
 
       ///setStorage
@@ -291,8 +268,7 @@ class P4DPageManager {
     }
     var page = _getPage(pageId);
     if (page is JSValue && !page.isUndefined()) {
-      pageMap.update(pageId, (value) => page,
-          ifAbsent: () => pageMap[pageId] = page);
+      pageMap.update(pageId, (value) => page, ifAbsent: () => pageMap[pageId] = page);
       return page;
     } else {
       return null;
@@ -301,9 +277,7 @@ class P4DPageManager {
 
   JSValue _getPage(String pageId) {
     var engine = JSEngine.instance;
-    return engine.global
-        .getProperty("getPage")
-        .callJS([engine.toJSVal(pageId)]);
+    return engine.global.getProperty("getPage").callJS([engine.toJSVal(pageId)]);
   }
 
   JSValue _setProtoType(JSValue from, JSValue use) {
@@ -341,9 +315,7 @@ class P4DPageManager {
           }
         }
         var dartArray = engine.fromJSVal(params);
-        var paramsVal = (dartArray as List)
-            .map((element) => engine.toJSVal(element))
-            .toList();
+        var paramsVal = (dartArray as List).map((element) => engine.toJSVal(element)).toList();
         // this.currentPageId =
         //     (page as JSValue).getProperty("pageId").toDartString();
 
@@ -363,18 +335,13 @@ class P4DPageManager {
     }
   }
 
-  void onNetworkResult(
-      String pageId, String requestId, String success, String json) {
+  void onNetworkResult(String pageId, String requestId, String success, String json) {
     try {
       var engine = JSEngine.instance;
       var realPage = _getJSPage(pageId);
       if (realPage != null) {
-        (realPage as JSValue).getProperty("p4d").invokeObject(
-            "onNetworkResult", [
-          engine.newString(requestId),
-          engine.newString(success),
-          engine.newString(json)
-        ]);
+        (realPage as JSValue).getProperty("p4d").invokeObject("onNetworkResult",
+            [engine.newString(requestId), engine.newString(success), engine.newString(json)]);
       }
     } catch (e) {
       throw e;
@@ -383,12 +350,11 @@ class P4DPageManager {
 
   void onRefresh(String pageId, String json) {
     // logger.i({"pageId": pageId, "json": json});
-    EventManager.eventBus.fire(
-        EventManager.sendMessage(EventManager.TYPE_REFRESH, pageId, json));
+    EventManager.eventBus.fire(EventManager.sendMessage(EventManager.TYPE_REFRESH, pageId, json));
   }
 
-  JSValue handleRepeat(String pageId, String componentId, String type,
-      String key, int watch, String expression) {
+  JSValue handleRepeat(
+      String pageId, String componentId, String type, String key, int watch, String expression) {
     var engine = JSEngine.instance;
     var page = _getJSPage(pageId);
     var watchVal = watch == 1 ? true : false;
@@ -410,8 +376,8 @@ class P4DPageManager {
     }
   }
 
-  String handleExpression(String pageId, String componentId, String type,
-      String key, int watch, String expression) {
+  String handleExpression(
+      String pageId, String componentId, String type, String key, int watch, String expression) {
     var engine = JSEngine.instance;
     var page = _getJSPage(pageId);
     var watchVal = watch == 1 ? true : false;
@@ -461,8 +427,7 @@ class P4DPageManager {
       var page = _getJSPage(pageId);
       var paramsVal = ids.map((element) => engine.toJSVal(element)).toList();
       if (page != null) {
-        (page as JSValue)
-            .invokeObject("__native__removeObserverByIds", paramsVal);
+        (page as JSValue).invokeObject("__native__removeObserverByIds", paramsVal);
       }
     } catch (e) {
       throw e;
