@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/widgets.dart';
 import 'package:pocket4d/p4d/p4d.dart';
+import 'package:pocket4d/page/app.dart';
 import 'package:thrio/thrio.dart';
 
 class Module
@@ -23,6 +24,20 @@ class Module
         return P4D(
           bundleApiUrl: endpoint,
           p4dApp: restParams.keys.length == 0 ? null : restParams,
+        );
+      },
+    );
+    registerPageBuilder(
+      '/p4dApp',
+      (settings) {
+        print("settings.params :${settings.params}");
+        var params = Map<String, dynamic>.from(settings.params);
+        var args = Map<String, dynamic>.from(params["args"]);
+        return P4DApp(
+          params["bundleApiUrl"],
+          params["appId"],
+          params["name"],
+          args,
         );
       },
     );

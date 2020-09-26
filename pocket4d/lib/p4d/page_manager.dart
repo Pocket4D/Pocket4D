@@ -118,16 +118,19 @@ class P4DPageManager {
       p4d.addCallback(DartCallback(
           engine: engine,
           name: 'navigateTo',
-          handler: (args, localEngine, thisVal) {
+          handler: (args, localEngine, thisVal) async {
             var localPageId = page.getProperty("pageId").toDartString();
-            var data = engine.fromJSVal(args[0]);
-            if (null != data) {
-              var jsonObject = Map();
-              (data as Map).keys.forEach((element) {
-                jsonObject.putIfAbsent(element, () => data[element]);
-              });
-              EventManager.eventBus.fire(EventManager.sendMessage(
-                  EventManager.TYPE_NAVIGATE_TO, localPageId, jsonEncode(jsonObject)));
+            // var data = engine.fromJSVal(args[0]);
+            var dataString = args[0].toJSONString();
+            if (null != dataString) {
+              // var jsonObject = Map();
+              // (data as Map).keys.forEach((element) {
+              //   jsonObject.putIfAbsent(element, () => data[element]);
+              // });
+              // EventManager.eventBus.fire(EventManager.sendMessage(
+              //     EventManager.TYPE_NAVIGATE_TO, localPageId, jsonEncode(jsonObject)));
+              EventManager.eventBus.fire(
+                  EventManager.sendMessage(EventManager.TYPE_NAVIGATE_TO, localPageId, dataString));
             }
           }));
 

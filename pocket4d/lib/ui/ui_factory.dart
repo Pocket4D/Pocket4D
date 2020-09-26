@@ -11,7 +11,7 @@ import 'package:pocket4d/ui/stack.dart';
 import 'package:pocket4d/ui/text.dart';
 import 'package:pocket4d/ui/visibility.dart';
 import 'package:pocket4d/util/expression_util.dart';
-import 'package:quickjs_dart/quickjs_dart.dart';
+// import 'package:quickjs_dart/quickjs_dart.dart';
 
 import 'aspect_ratio.dart';
 import 'base_widget.dart';
@@ -31,31 +31,32 @@ class UIFactory {
   UIFactory(this._pageId);
 
   /// 克隆节点id, inRepeatIndex, inRepeatPrefixExp不为空
-  Component createComponentTree(
+  Future<Component> createComponentTree(
       Component parent, Map<String, dynamic> node, Map<String, dynamic> styles,
-      {id, inRepeatIndex, inRepeatPrefixExp}) {
+      {id, inRepeatIndex, inRepeatPrefixExp}) async {
     var component = Component(parent, node, styles,
         id: id, inRepeatIndex: inRepeatIndex, inRepeatPrefixExp: inRepeatPrefixExp);
     _componentMap.putIfAbsent(component.id, () => component);
-    _addChildren(component, node, styles);
+    await _addChildren(component, node, styles);
     return component;
   }
 
   /// 为Component添加children
-  _addChildren(Component parent, Map<String, dynamic> data, Map<String, dynamic> styles) {
+  Future _addChildren(
+      Component parent, Map<String, dynamic> data, Map<String, dynamic> styles) async {
     var children = data['childNodes'];
     if (null != children) {
       for (var child in children) {
-        var result = createComponentTree(parent, child, styles);
+        var result = await createComponentTree(parent, child, styles);
         parent.children.add(result);
       }
     }
   }
 
-  List<BaseWidget> _getChildren(BaseWidget parent, Component component) {
+  Future<List<BaseWidget>> _getChildren(BaseWidget parent, Component component) async {
     List<BaseWidget> children = [];
     for (var it in component?.children) {
-      var child = createWidgetTree(parent, it);
+      var child = await createWidgetTree(parent, it);
       if (null != child) {
         if (child is List<BaseWidget>) {
           children.addAll(child);
@@ -77,7 +78,7 @@ class UIFactory {
     }
   }
 
-  createWidgetTree(BaseWidget parent, Component component, {newSize}) {
+  Future<dynamic> createWidgetTree(BaseWidget parent, Component component, {newSize}) async {
     var repeat = component.getRealForExpression();
     if (null != repeat) {
       repeat = getInRepeatExp(component, repeat);
@@ -98,7 +99,7 @@ class UIFactory {
           /// 缓存复用
           var clone = _componentMap[inRepeatId];
           if (null == clone) {
-            clone = createComponentTree(component.parent, component.node, component.styles,
+            clone = await createComponentTree(component.parent, component.node, component.styles,
                 id: inRepeatId, inRepeatIndex: index, inRepeatPrefixExp: inRepeatPrefixExp);
           }
 
@@ -109,7 +110,7 @@ class UIFactory {
           var widget = _widgetMap[inRepeatId];
           if (null == widget) {
             widget = _createWidget(parent, clone);
-            widget.setChildren(_getChildren(widget, clone));
+            widget.setChildren(await _getChildren(widget, clone));
             _widgetMap.putIfAbsent(clone.id, () => widget);
           } else {
             /// 此处复用需要更新复用的属性及children的属性的表达式值
@@ -125,7 +126,7 @@ class UIFactory {
     } else {
       handleProperty(_pageId, component);
       BaseWidget widget = _createWidget(parent, component);
-      widget.setChildren(_getChildren(widget, component));
+      widget.setChildren(await _getChildren(widget, component));
       _widgetMap.putIfAbsent(component.id, () => widget);
       return widget;
     }
@@ -212,12 +213,12 @@ class UIFactory {
     _widgetMap.clear();
   }
 
-  List<BaseWidget> _getNewChildren(
-      Component parent, Component component, BaseWidget parentWidget, int size) {
+  Future<List<BaseWidget>> _getNewChildren(
+      Component parent, Component component, BaseWidget parentWidget, int size) async {
     List<BaseWidget> children = [];
     for (var it in parent.children) {
       if (it == component) {
-        List<BaseWidget> result = createWidgetTree(parentWidget, component, newSize: size);
+        List<BaseWidget> result = await createWidgetTree(parentWidget, component, newSize: size);
         if (null != result) {
           children.addAll(result);
         }
@@ -240,7 +241,7 @@ class UIFactory {
     return children;
   }
 
-  updateTree(List<dynamic> list) {
+  updateTree(List<dynamic> list) async {
     for (var it in list) {
       var type = it['type'];
       var id = it['id'];
@@ -255,7 +256,8 @@ class UIFactory {
               var parentComponent = _componentMap[parentId];
               var parentWidget = _widgetMap[parentId];
               var newSize = it['value'];
-              var children = _getNewChildren(parentComponent, component, parentWidget, newSize);
+              var children =
+                  await _getNewChildren(parentComponent, component, parentWidget, newSize);
               parentWidget.updateChildren(children);
             }
           }

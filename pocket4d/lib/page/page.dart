@@ -71,7 +71,6 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
 
   _initMessageHandler(Map<String, dynamic> message) {
     logger.i(message);
-
     var pageId = message['pageId'];
     P4DMessageHandler handler = _handlers[pageId];
     if (null != handler) {
@@ -140,19 +139,19 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
           ..putIfAbsent("pageCode", () => path)
           ..putIfAbsent("args", () => params);
         // Navigator.of(context).push(MaterialPageRoute(
-        //     builder: (context) =>
-        //         P4DPage(widget.appId, widget.name, args, _pages, _handlers, _indexPage)));
-        ThrioNavigator.push(url: '/p4d', params: {
-          "AppId": widget.appId,
-          "Name": widget.name,
+        //     builder: (context) => P4DPage(widget.bundleApiUrl, widget.appId, widget.name, args,
+        //         _pages, _handlers, _indexPage)));
+        ThrioNavigator.push(url: '/p4dApp', params: {
+          "bundleApiUrl": widget.bundleApiUrl,
+          "appId": widget.appId,
+          "name": widget.name,
           "args": args,
-          "endpoint": widget.bundleApiUrl
         });
       }
     }
   }
 
-  void _create() {
+  void _create() async {
     var body = _data['body'];
     var styles = _data['style'];
     var script = _data['script'];
@@ -164,8 +163,8 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
     _initConfig(config);
     _initScript(script);
     _callOnLoad();
-    var component = _factory.createComponentTree(null, body, styles);
-    var tree = _factory.createWidgetTree(null, component);
+    var component = await _factory.createComponentTree(null, body, styles);
+    var tree = await _factory.createWidgetTree(null, component);
 
     setState(() {
       _tree = tree;
