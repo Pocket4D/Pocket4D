@@ -7,8 +7,8 @@ import 'package:pocket4d/ui/base_widget.dart';
 
 import 'basic.dart';
 
-class ContainerStateless extends BaseWidget {
-  ContainerStateless(BaseWidget parent, String pageId, Component component)
+class ContainerTag extends BaseWidget {
+  ContainerTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
@@ -16,13 +16,18 @@ class ContainerStateless extends BaseWidget {
             data: ValueNotifier(Data(component.properties)));
 
   @override
+  _ContainerTagState createState() => _ContainerTagState();
+}
+
+class _ContainerTagState extends State<ContainerTag> {
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         builder: (BuildContext context, Data data, Widget child) {
           var alignment = MAlignment.parse(data.map['alignment'], defaultValue: Alignment.topLeft);
 
           return Container(
-              key: ObjectKey(component),
+              key: ObjectKey(widget.component),
               alignment: alignment,
               color: MColor.parse(data.map['color']),
               width: MDouble.parse(data.map['width']),
@@ -31,6 +36,6 @@ class ContainerStateless extends BaseWidget {
               padding: MPadding.parse(data.map),
               child: data.children.isNotEmpty ? data.children[0] : null);
         },
-        valueListenable: this.data);
+        valueListenable: widget.data);
   }
 }

@@ -7,8 +7,8 @@ import 'package:pocket4d/ui/base_widget.dart';
 
 import 'basic.dart';
 
-class ExpandedStateless extends BaseWidget {
-  ExpandedStateless(BaseWidget parent, String pageId, Component component)
+class ExpandedTag extends BaseWidget {
+  ExpandedTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
@@ -16,14 +16,19 @@ class ExpandedStateless extends BaseWidget {
             data: ValueNotifier(Data(component.properties)));
 
   @override
+  _ExpandedTagState createState() => _ExpandedTagState();
+}
+
+class _ExpandedTagState extends State<ExpandedTag> {
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         builder: (BuildContext context, Data data, Widget child) {
           return Expanded(
-              key: ObjectKey(component),
+              key: ObjectKey(widget.component),
               flex: MInt.parse(data.map['flex'], defaultValue: 1),
               child: data.children.isNotEmpty ? data.children[0] : null);
         },
-        valueListenable: this.data);
+        valueListenable: widget.data);
   }
 }

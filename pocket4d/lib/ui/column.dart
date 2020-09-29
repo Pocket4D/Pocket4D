@@ -7,8 +7,8 @@ import 'package:pocket4d/ui/base_widget.dart';
 
 import 'basic.dart';
 
-class ColumnStateless extends BaseWidget {
-  ColumnStateless(BaseWidget parent, String pageId, Component component)
+class ColumnTag extends BaseWidget {
+  ColumnTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
@@ -16,11 +16,16 @@ class ColumnStateless extends BaseWidget {
             data: ValueNotifier(Data(component.properties)));
 
   @override
+  _ColumnTagState createState() => _ColumnTagState();
+}
+
+class _ColumnTagState extends State<ColumnTag> {
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         builder: (BuildContext context, Data data, Widget child) {
           return Column(
-              key: ObjectKey(component),
+              key: ObjectKey(widget.component),
               mainAxisAlignment: MMainAxisAlignment.parse(data.map["main-axis-alignment"],
                   defaultValue: MainAxisAlignment.start),
               mainAxisSize:
@@ -33,6 +38,6 @@ class ColumnStateless extends BaseWidget {
               textBaseline: MTextBaseline.parse(data.map["text-baseline"]),
               children: data.children);
         },
-        valueListenable: this.data);
+        valueListenable: widget.data);
   }
 }

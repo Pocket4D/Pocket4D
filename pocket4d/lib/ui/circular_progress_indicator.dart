@@ -8,8 +8,8 @@ import 'package:pocket4d/ui/basic.dart';
 
 import 'base_widget.dart';
 
-class CircularProgressIndicatorStateless extends BaseWidget {
-  CircularProgressIndicatorStateless(BaseWidget parent, String pageId, Component component)
+class CircularProgressIndicatorTag extends BaseWidget {
+  CircularProgressIndicatorTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
@@ -17,11 +17,16 @@ class CircularProgressIndicatorStateless extends BaseWidget {
             data: ValueNotifier(Data(component.properties)));
 
   @override
+  _CircularProgressIndicatorTagState createState() => _CircularProgressIndicatorTagState();
+}
+
+class _CircularProgressIndicatorTagState extends State<CircularProgressIndicatorTag> {
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         builder: (BuildContext context, Data data, Widget child) {
           return CircularProgressIndicator(
-            key: ObjectKey(component),
+            key: ObjectKey(widget.component),
             value: MDouble.parse(data.map['value']),
             backgroundColor: MColor.parse(data.map['background-color']),
 //            valueColor: ,
@@ -30,6 +35,6 @@ class CircularProgressIndicatorStateless extends BaseWidget {
             semanticsValue: data.map["semantics-value"]?.getValue(),
           );
         },
-        valueListenable: this.data);
+        valueListenable: widget.data);
   }
 }

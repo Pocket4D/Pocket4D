@@ -5,7 +5,7 @@ import 'package:pocket4d/entity/data.dart';
 import 'package:pocket4d/entity/property.dart';
 // import 'package:quickjs_dart/quickjs_dart.dart';
 
-abstract class BaseWidget extends StatelessWidget {
+abstract class BaseWidget extends StatefulWidget {
   final String pageId;
   final Component component;
   // final JSEngine engine;

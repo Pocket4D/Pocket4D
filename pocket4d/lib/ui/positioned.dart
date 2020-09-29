@@ -7,19 +7,25 @@ import 'package:pocket4d/ui/base_widget.dart';
 
 import 'basic.dart';
 
-class PositionedStateless extends BaseWidget {
-  PositionedStateless(BaseWidget parent, String pageId, Component component)
+class PositionedTag extends BaseWidget {
+  PositionedTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
             component: component,
             data: ValueNotifier(Data(component.properties)));
+
+  @override
+  _PositionedTagState createState() => _PositionedTagState();
+}
+
+class _PositionedTagState extends State<PositionedTag> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         builder: (BuildContext context, Data data, Widget child) {
           return Positioned(
-              key: ObjectKey(component),
+              key: ObjectKey(widget.component),
               left: MDouble.parse(data.map['left']),
               right: MDouble.parse(data.map['right']),
               top: MDouble.parse(data.map['top']),
@@ -28,6 +34,6 @@ class PositionedStateless extends BaseWidget {
               height: MDouble.parse(data.map['height']),
               child: data.children.isNotEmpty ? data.children[0] : null);
         },
-        valueListenable: this.data);
+        valueListenable: widget.data);
   }
 }

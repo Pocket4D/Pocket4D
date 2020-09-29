@@ -7,8 +7,8 @@ import 'package:pocket4d/entity/data.dart';
 import 'base_widget.dart';
 import 'basic.dart';
 
-class VisibilityStateless extends BaseWidget {
-  VisibilityStateless(BaseWidget parent, String pageId, Component component)
+class VisibilityTag extends BaseWidget {
+  VisibilityTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
@@ -16,15 +16,20 @@ class VisibilityStateless extends BaseWidget {
             data: ValueNotifier(Data(component.properties)));
 
   @override
+  _VisibilityTagState createState() => _VisibilityTagState();
+}
+
+class _VisibilityTagState extends State<VisibilityTag> {
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         builder: (BuildContext context, Data data, Widget child) {
           return Visibility(
-              key: ObjectKey(component),
+              key: ObjectKey(widget.component),
               visible: MBool.parse(data.map['visible'], defaultValue: true),
               child: data.children.length > 0 ? data.children[0] : null,
               replacement: data.children.length > 1 ? data.children[1] : const SizedBox.shrink());
         },
-        valueListenable: this.data);
+        valueListenable: widget.data);
   }
 }

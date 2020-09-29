@@ -52,8 +52,7 @@ class MMainAxisAlignment {
 }
 
 class MMainAxisSize {
-  static MainAxisSize parse(Property value,
-      {MainAxisSize defaultValue = MainAxisSize.min}) {
+  static MainAxisSize parse(Property value, {MainAxisSize defaultValue = MainAxisSize.min}) {
     MainAxisSize result = defaultValue;
     if (null == value) return result;
     switch (value.getValue()) {
@@ -160,10 +159,7 @@ class MMargin {
     var marginRight = properties['margin-right'];
     var marginBottom = properties['margin-bottom'];
     EdgeInsets margin;
-    if (marginLeft != null ||
-        marginTop != null ||
-        marginRight != null ||
-        marginBottom != null) {
+    if (marginLeft != null || marginTop != null || marginRight != null || marginBottom != null) {
       margin = EdgeInsets.fromLTRB(
           MDouble.parse(marginLeft, defaultValue: 0),
           MDouble.parse(marginTop, defaultValue: 0),
@@ -172,8 +168,7 @@ class MMargin {
     }
 
     if (null != properties['margin']) {
-      margin =
-          EdgeInsets.all(MDouble.parse(properties['margin'], defaultValue: 0));
+      margin = EdgeInsets.all(MDouble.parse(properties['margin'], defaultValue: 0));
     }
     return margin;
   }
@@ -197,16 +192,14 @@ class MPadding {
           MDouble.parse(paddingBottom, defaultValue: 0));
     }
     if (null != properties['padding']) {
-      padding =
-          EdgeInsets.all(MDouble.parse(properties['padding'], defaultValue: 0));
+      padding = EdgeInsets.all(MDouble.parse(properties['padding'], defaultValue: 0));
     }
     return padding;
   }
 }
 
 class MAlignment {
-  static Alignment parse(Property value,
-      {Alignment defaultValue = Alignment.topLeft}) {
+  static Alignment parse(Property value, {Alignment defaultValue = Alignment.topLeft}) {
     Alignment result = defaultValue;
     if (null == value) return result;
     switch (value.getValue()) {
@@ -333,6 +326,16 @@ class MBool {
     bool result = defaultValue;
     if (null != value) {
       result = 'false' == value.getValue();
+    }
+    return result;
+  }
+}
+
+class MString {
+  static String parse(Property value, {String defaultValue}) {
+    String result = defaultValue;
+    if (null != value) {
+      result = value.getValue();
     }
     return result;
   }

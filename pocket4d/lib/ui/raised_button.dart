@@ -8,14 +8,19 @@ import 'package:pocket4d/util/color_util.dart';
 import 'package:pocket4d/util/event_util.dart';
 // import 'package:quickjs_dart/quickjs_dart.dart';
 
-class RaisedButtonStateless extends BaseWidget {
-  RaisedButtonStateless(BaseWidget parent, String pageId, Component component)
+class RaisedButtonTag extends BaseWidget {
+  RaisedButtonTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
             component: component,
             data: ValueNotifier(Data(component.properties)));
 
+  @override
+  _RaisedButtonTagState createState() => _RaisedButtonTagState();
+}
+
+class _RaisedButtonTagState extends State<RaisedButtonTag> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -31,12 +36,12 @@ class RaisedButtonStateless extends BaseWidget {
 
           return RaisedButton(
               onPressed: () {
-                var bindTap = component.events['bindtap'];
+                var bindTap = widget.component.events['bindtap'];
                 if (null != bindTap) {
-                  onTapEvent(pageId, this.hashCode.toString(), data.map, bindTap);
+                  onTapEvent(widget.pageId, this.hashCode.toString(), data.map, bindTap);
                 }
               },
-              key: ObjectKey(component),
+              key: ObjectKey(widget.component),
               textColor: textColor,
               disabledTextColor: disabledTextColor,
               color: color,
@@ -47,6 +52,6 @@ class RaisedButtonStateless extends BaseWidget {
               splashColor: splashColor,
               child: data.children.isNotEmpty ? data.children[0] : null);
         },
-        valueListenable: this.data);
+        valueListenable: widget.data);
   }
 }

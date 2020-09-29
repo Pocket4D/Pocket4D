@@ -9,39 +9,44 @@ import 'package:pocket4d/util/event_util.dart';
 import 'base_widget.dart';
 import 'basic.dart';
 
-class ListViewStateless extends BaseWidget {
-  ListViewStateless(BaseWidget parent, String pageId, Component component)
+class ListViewTag extends BaseWidget {
+  ListViewTag(BaseWidget parent, String pageId, Component component)
       : super(
             parent: parent,
             pageId: pageId,
             component: component,
             data: ValueNotifier(Data(component.properties)));
 
+  @override
+  _ListViewTagState createState() => _ListViewTagState();
+}
+
+class _ListViewTagState extends State<ListViewTag> {
   void _scrollToUpper() {
-    var upper = component.events["bindscrolltoupper"];
+    var upper = widget.component.events["bindscrolltoupper"];
     if (null != upper) {
-      onScrollLimitEvent(pageId, component.id, upper);
+      onScrollLimitEvent(widget.pageId, widget.component.id, upper);
     }
   }
 
   void _scrollToLower() {
-    var lower = component.events["bindscrolltolower"];
+    var lower = widget.component.events["bindscrolltolower"];
     if (null != lower) {
-      onScrollLimitEvent(pageId, component.id, lower);
+      onScrollLimitEvent(widget.pageId, widget.component.id, lower);
     }
   }
 
   void _scroll(double pixels) {
-    var bindScroll = component.events["bindscroll"];
+    var bindScroll = widget.component.events["bindscroll"];
     if (null != bindScroll) {
-      onScrollEvent(pageId, component.id, bindScroll, pixels);
+      onScrollEvent(widget.pageId, widget.component.id, bindScroll, pixels);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-      key: ObjectKey(component),
+      key: ObjectKey(widget.component),
       child: NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification notification) {
             if (notification is ScrollEndNotification) {
@@ -77,7 +82,7 @@ class ListViewStateless extends BaseWidget {
                     children: data.children,
                     semanticChildCount: MInt.parse(data.map["semantic-child-count"]));
               },
-              valueListenable: this.data)),
+              valueListenable: widget.data)),
     );
   }
 }
