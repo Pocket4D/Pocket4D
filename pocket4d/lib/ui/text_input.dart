@@ -6,6 +6,7 @@ import 'package:pocket4d/ui/base_widget.dart';
 import 'package:pocket4d/ui/basic.dart';
 import 'package:pocket4d/util/color_util.dart';
 import 'package:pocket4d/util/event_util.dart';
+import 'package:quickjs_dart/quickjs_dart.dart';
 
 class TextFieldTag extends BaseWidget {
   TextFieldTag(BaseWidget parent, String pageId, Component component)
@@ -26,7 +27,6 @@ class _TextFieldTagState extends State<TextFieldTag> {
     return ValueListenableBuilder(
         builder: (BuildContext context, Data data, Widget child) {
           _controller.text = MString.parse(data.map['value'], defaultValue: null);
-
           return TextField(
               controller: _controller,
               onChanged: (value) {
@@ -59,7 +59,6 @@ class _TextFieldTagState extends State<TextFieldTag> {
               enabled: !MBool.parse(widget.component.properties["disabled"], defaultValue: false),
               maxLength: MInt.parse(widget.component.properties["maxlength"], defaultValue: 140),
               autofocus: MBool.parse(widget.component.properties["focus"], defaultValue: false),
-
               // cursorHeight: MDouble.parse(component.properties["cursor-spacing"], defaultValue: 0),
               key: ObjectKey(widget.component),
               style: TextStyle(

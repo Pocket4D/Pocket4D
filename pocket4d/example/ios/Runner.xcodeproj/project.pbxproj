@@ -256,6 +256,7 @@
 				"${BUILT_PRODUCTS_DIR}/pocket4d/pocket4d.framework",
 				"${PODS_ROOT}/../.symlinks/plugins/quickjs_dart/ios/quickjs.framework",
 				"${BUILT_PRODUCTS_DIR}/quickjs_dart/quickjs_dart.framework",
+				"${BUILT_PRODUCTS_DIR}/thrio/thrio.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -266,6 +267,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/pocket4d.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/quickjs.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/quickjs_dart.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/thrio.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

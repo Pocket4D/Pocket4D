@@ -299,6 +299,7 @@ class P4DPageManager {
 
   void callMethodInPage(String pageId, String method, String args) {
     try {
+      print({pageId, method, args});
       var engine = JSEngine.instance;
       var page = _getJSPage(pageId);
       if (method != "" &&

@@ -232,7 +232,7 @@ class _P4DPageState extends State<P4DPage> with P4DMessageHandler {
 
   Future<void> _onRefresh() async {
     viewApi.onPullDownRefresh(_pageId);
-    _completer = new Completer<bool>();
+    _completer = Completer<bool>();
     return _completer.future.then((bool success) {
       return success;
     });

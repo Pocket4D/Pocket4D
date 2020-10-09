@@ -9,6 +9,8 @@ PODS:
     - Flutter
   - quickjs_dart (0.0.1):
     - Flutter
+  - thrio (0.5.0):
+    - Flutter
   - Toast (4.0.0)
 
 DEPENDENCIES:
@@ -17,6 +19,7 @@ DEPENDENCIES:
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - pocket4d (from `.symlinks/plugins/pocket4d/ios`)
   - quickjs_dart (from `.symlinks/plugins/quickjs_dart/ios`)
+  - thrio (from `.symlinks/plugins/thrio/ios`)
 
 SPEC REPOS:
   trunk:
@@ -33,15 +36,18 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/pocket4d/ios"
   quickjs_dart:
     :path: ".symlinks/plugins/quickjs_dart/ios"
+  thrio:
+    :path: ".symlinks/plugins/thrio/ios"
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   pocket4d: 162c7d142344563bb8917f0fbd1da17a69f41668
-  quickjs_dart: 00c3f04c0027a460fb2a67e7d740588fe4dadcf0
+  quickjs_dart: 5be0b645e94442c1d7dc8050059f5f7c85c2a2f2
+  thrio: 248b38782daa3392424dfb3b0c340df50fc66cf3
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.0.rc.1

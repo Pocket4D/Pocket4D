@@ -325,7 +325,7 @@ class MBool {
   static bool parse(Property value, {bool defaultValue}) {
     bool result = defaultValue;
     if (null != value) {
-      result = 'false' == value.getValue();
+      result = 'true' == value.getValue() ? true : false;
     }
     return result;
   }

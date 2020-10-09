@@ -24,7 +24,7 @@ export 'store.dart';
 class GlobalStore extends StatefulWidget {
   final String entrypoint;
 
-  const GlobalStore({this.entrypoint = ''});
+  const GlobalStore({this.entrypoint = 'main'});
 
   @override
   _GlobalStoreState createState() => _GlobalStoreState();

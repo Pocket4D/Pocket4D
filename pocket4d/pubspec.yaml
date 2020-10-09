@@ -4,7 +4,7 @@ version: 0.0.1
 homepage: 'https://github.com/pocket4d'
 
 environment:
-  sdk: '>=2.1.0 <3.0.0'
+  sdk: '>=2.2.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -20,7 +20,7 @@ dependencies:
   uuid: ^2.2.2
   fluttertoast: ^7.1.1
   quickjs_dart: '>=0.0.1 <1.0.0'
-  thrio: ^0.4.4
+  thrio: '^0.5.0'
 
 dev_dependencies:
   flutter_test:
